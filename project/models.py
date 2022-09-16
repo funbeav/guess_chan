@@ -23,8 +23,13 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
 
     objects = UserManager()
 
-    class Meta:
-        ordering = ('login',)
-
     def __str__(self):
         return f'{self.login}'
+
+
+class Lang(models.Model):
+    alpha = models.CharField(max_length=5, unique=True)
+    name = models.CharField(max_length=30)
+
+    def __str__(self):
+        return f'{self.name} ({self.alpha})'
