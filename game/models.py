@@ -41,3 +41,6 @@ class ChanAlternative(models.Model):
     chan = models.ForeignKey(Chan, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, unique=True)
     lang = models.ForeignKey(Lang, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return f'{self.chan.name} ~ {self.name}'
