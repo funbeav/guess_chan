@@ -130,3 +130,5 @@ dmypy.json
 
 # Idea
 .idea
+.test_data/
+media/
