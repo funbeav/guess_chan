@@ -1,16 +1,9 @@
-import os
-import uuid
-
 import imagehash
 from PIL import Image
 from django.db import models
 
+from common.utils import generate_filename
 from project.models import Lang
-
-
-def generate_filename(instance, filename):
-    ext = filename.split('.')[-1]
-    return os.path.join(f'images/{instance.folder}', f'{uuid.uuid4()}.{ext}')
 
 
 class BaseImage(models.Model):
@@ -38,7 +31,7 @@ class CharacterImage(BaseImage):
     character = models.ForeignKey(Character, on_delete=models.SET_NULL, null=True, blank=True)
 
     @property
-    def folder(self):
+    def image_folder(self):
         return 'character'
 
 
@@ -54,7 +47,7 @@ class ChanImage(BaseImage):
     chan = models.ForeignKey(Chan, on_delete=models.SET_NULL, null=True, blank=True)
 
     @property
-    def folder(self):
+    def image_folder(self):
         return 'chan'
 
 

@@ -1,0 +1,21 @@
+{% extends 'game/base.html' %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block content %}
+    <br><h1>Game</h1><br>
+    {% if tasks %}
+        {% for el in tasks %}
+            <a href="{% url 'task:edit' el.id %}" style="text-decoration: none">
+                <div class="alert alert-warning mt-2">
+                    <h3>{{ el.title }}</h3>
+                    <p>{{ el.task }}</p>
+                </div>
+            </a>
+        {% endfor %}
+    {% else %}
+        <p>Записи отсутствуют!</p>
+    {% endif %}
+{% endblock %}

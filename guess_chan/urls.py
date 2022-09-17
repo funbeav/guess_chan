@@ -7,8 +7,8 @@ from django.urls.conf import include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('project/', include('project.urls'), name='project'),
-    path('game/', include('game.urls'), name='game'),
     path('api/', include('api.urls'), name='api'),
+    path('', include('game.urls'), name='game'),
 ]
 
 if settings.DEBUG:
