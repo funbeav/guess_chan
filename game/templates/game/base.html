@@ -23,7 +23,14 @@
 
             <div class="text-end">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'game:login' %}" class="link-light px-4">{{ user.login }}</a>
+                    <a href="{% url 'game:login' %}" class="link-light text-decoration-none">{{ user.login }}</a>
+                    <a href="{% url 'game:login' %}" class="link-unstyled text-decoration-none px-2">
+                        {% if user.image %}
+                            <img src="{{ user.image.url }}" width="45" height="45" style="border-radius: 50%;">
+                        {% else %}
+                            <img src="/media/images/sample/avatar.jpg" width="45" height="45" style="border-radius: 50%;">
+                        {% endif %}
+                    </a>
                     <a href="{% url 'game:logout' %}"><button style="width: 110px;" class="btn btn-outline-light">Log Out</button></a>
                 {% else %}
                     <form class="row" method="post" action="{% url 'game:login' %}" >

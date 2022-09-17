@@ -26,20 +26,11 @@ def get_answer_result(answer, chan_image_id):
 def index(request):
     answer_result = None
     if request.method == 'POST':
-        answer_result = get_answer_result(
-            request.POST['answer'],
-            request.POST['image_id'],
-        )
-        image = {
-            'id': 0,
-            'url': answer_result['url'],
-        }
+        answer_result = get_answer_result(request.POST['answer'], request.POST['image_id'])
+        image = {'id': 0, 'url': answer_result['url']}
     else:
         chan_image = get_next_chan_image_for_user(request.user)
-        image = {
-            'id': chan_image.id,
-            'url': chan_image.image.url,
-        }
+        image = {'id': chan_image.id, 'url': chan_image.image.url}
     attrs = {
         'user': request.user,
         'form': UserLoginForm(request),
