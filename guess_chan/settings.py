@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'project',
     'game',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -127,9 +128,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ]
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # ]
 }
 
 # Base url to serve media files

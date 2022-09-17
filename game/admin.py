@@ -1,16 +1,15 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from game.models import Chan, ChanAlternative, ChanImage
+from game.models import Chan, CharacterName, ChanImage, Character, CharacterImage
 
 
-class ChanImageInline(admin.StackedInline):
-    model = ChanImage
-    fields = ['image_preview']
+class ImagePreviewInline(admin.StackedInline):
+    fields = ['image', 'caption', 'image_preview']
     readonly_fields = ('image_preview',)
     show_change_link = True
     can_delete = False
-    max_num = 0
+    extra = 1
 
     def image_preview(self, instance):
         url = instance.image.url
@@ -19,10 +18,16 @@ class ChanImageInline(admin.StackedInline):
     image_preview.short_description = 'Preview'
 
 
-class ChanAlternativeInline(admin.TabularInline):
-    model = ChanAlternative
-    fields = ['name', 'lang']
-    extra = 1
+class ImageAdmin(admin.ModelAdmin):
+    def image_preview(self, instance):
+        url = instance.image.url
+        return format_html(f'<a href="{url}"><img src="{url}" width=100 high=100/></a>')
+
+    image_preview.short_description = 'Preview'
+
+
+class ChanImageInline(ImagePreviewInline):
+    model = ChanImage
 
 
 @admin.register(Chan)
@@ -31,22 +36,42 @@ class ChanAdmin(admin.ModelAdmin):
         css = {
             'all': ('css/custom_admin.css',)
         }
-    list_display = ('name',)
-    inlines = [ChanAlternativeInline, ChanImageInline]
+    list_display = ('name', 'character',)
+    inlines = [ChanImageInline]
 
 
 @admin.register(ChanImage)
-class ChanImageAdmin(admin.ModelAdmin):
+class ChanImageAdmin(ImageAdmin):
     list_display = ('hash', 'caption', 'chan', 'image_preview', 'author',)
     fields = ('image', 'chan', 'caption', 'author',)
 
-    def image_preview(self, instance):
-        url = instance.image.url
-        return format_html(f'<a href="{url}"><img src="{url}" width=100 high=100/></a>')
 
-    image_preview.short_description = 'Preview'
+class CharacterNameInline(admin.TabularInline):
+    model = CharacterName
+    fields = ['name', 'lang']
+    extra = 1
 
 
-@admin.register(ChanAlternative)
-class ChanAlternativeAdmin(admin.ModelAdmin):
-    list_display = ('chan', 'name', 'lang',)
+class CharacterImageInline(ImagePreviewInline):
+    model = CharacterImage
+
+
+@admin.register(CharacterImage)
+class CharacterImageAdmin(ImageAdmin):
+    list_display = ('hash', 'caption', 'character', 'image_preview', 'author',)
+    fields = ('image', 'character', 'caption', 'author',)
+
+
+@admin.register(Character)
+class CharacterAdmin(admin.ModelAdmin):
+    class Media:
+        css = {
+            'all': ('css/custom_admin.css',)
+        }
+    list_display = ('name',)
+    inlines = [CharacterNameInline, CharacterImageInline]
+
+
+@admin.register(CharacterName)
+class CharacterNameAdmin(admin.ModelAdmin):
+    list_display = ('character', 'name', 'lang',)
