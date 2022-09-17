@@ -27,11 +27,6 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
 
     objects = UserManager()
 
-    def save(self, *args, **kwargs):
-        if self.password is not None:
-            self.set_password(self.password)
-        super().save(*args, **kwargs)
-
     @property
     def image_folder(self):
         return 'user'
