@@ -13,7 +13,7 @@ class ImagePreviewInline(admin.StackedInline):
 
     def image_preview(self, instance):
         url = instance.image.url
-        return format_html(f'<a href="{url}"><img src="{url}" width=200 high=200/></a>')
+        return format_html(f'<a href="{url}"><img src="{url}" width=200 height=200/></a>')
 
     image_preview.short_description = 'Preview'
 
@@ -21,7 +21,7 @@ class ImagePreviewInline(admin.StackedInline):
 class ImageAdmin(admin.ModelAdmin):
     def image_preview(self, instance):
         url = instance.image.url
-        return format_html(f'<a href="{url}"><img src="{url}" width=100 high=100/></a>')
+        return format_html(f'<a href="{url}"><img src="{url}" width=100 height=100/></a>')
 
     image_preview.short_description = 'Preview'
 
