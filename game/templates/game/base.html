@@ -31,18 +31,16 @@
                             <img src="/media/images/sample/avatar.jpg" width="45" height="45" style="border-radius: 50%;">
                         {% endif %}
                     </a>
-                    <a href="{% url 'game:logout' %}"><button style="width: 110px;" class="btn btn-outline-light">Log Out</button></a>
+                    <a href="{% url 'game:logout' %}">
+                        <button class="btn btn-outline-light btn-sm">Log Out</button>
+                    </a>
                 {% else %}
-                    <form class="row" method="post" action="{% url 'game:login' %}" >
-                        {% csrf_token %}
-                        <div class="input-group" style="width: 150px; padding-left: 0">
-                            {{ form.username }}
-                        </div>
-                        <div class="input-group" style="width: 150px; padding-left: 0">
-                            {{ form.password }}
-                        </div>
-                        <input type="submit" class="btn btn-warning" style="width: 110px;" value="Log In">
-                    </form>
+                    <a href="{% url 'game:login' %}" class="text-decoration-none">
+                        <button class="btn btn-warning btn-sm">Log In</button>
+                    </a>
+                    <a href="{% url 'game:signup' %}" class="text-decoration-none">
+                        <button class="btn btn-outline-warning btn-sm" >Sign Up</button>
+                    </a>
                 {% endif %}
             </div>
           </div>
