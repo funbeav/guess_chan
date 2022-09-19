@@ -1,10 +1,10 @@
 from django.contrib.auth import password_validation
-from django.contrib.auth.forms import AuthenticationForm, UsernameField, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UsernameField, UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from django import forms
-from django.forms import EmailField
+from django.forms import EmailField, ImageField, BooleanField
 
 from project.models import User
 
@@ -56,7 +56,6 @@ class UserSignupForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("login", "email",)
-        field_classes = {"login": UsernameField, "email": EmailField}
 
     def clean_password1(self):
         return validate_password_strength(self.cleaned_data['password1'])
@@ -71,3 +70,19 @@ class UserSignupForm(UserCreationForm):
             )
         return password2
 
+
+class UserProfileForm(UserChangeForm):
+    login = UsernameField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Login'}))
+    email = EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
+    image = ImageField(widget=forms.FileInput(
+        attrs={'class': 'form-control form-control-sm', 'type': 'file'}),
+        required=False,
+    )
+    is_save_image = BooleanField(widget=forms.CheckboxInput(
+        attrs={'checked': True, 'class': 'form-check-input mt-0', 'type': 'checkbox'}),
+        required=False,
+    )
+
+    class Meta:
+        model = User
+        fields = ("login", "email", "image",)

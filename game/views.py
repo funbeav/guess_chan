@@ -2,8 +2,9 @@ from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import generic
 
-from game.forms import UserLoginForm, UserSignupForm
+from game.forms import UserLoginForm, UserSignupForm, UserProfileForm
 from game.models import ChanImage, CharacterName, CharacterImage
+from project.models import User
 
 
 def get_next_chan_image_for_user(user):
@@ -55,6 +56,20 @@ class SignUpView(generic.CreateView):
     success_url = reverse_lazy("game:login")
     template_name = "game/signup.html"
 
-    def post(self, request, *args, **kwargs):
-        return super().post(request, *args, **kwargs)
 
+class ProfileView(generic.UpdateView):
+    form_class = UserProfileForm
+    success_url = reverse_lazy("game:profile")
+    template_name = "game/profile.html"
+    queryset = User.objects.all()
+
+    def get_object(self, queryset=None):
+        obj = self.queryset.get(pk=self.request.user.id)
+        return obj
+
+    def post(self, request, *args, **kwargs):
+        if not request.POST.get('is_save_image'):
+            user = User.objects.get(id=request.user.id)
+            user.image = None
+            user.save()
+        return super().post(self, request, *args, **kwargs)

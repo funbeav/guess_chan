@@ -1,0 +1,52 @@
+{% extends "game/base.html" %}
+{% load static %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+
+<div class="mt-2 col-lg-3 col-lg-offset-4" style="margin: 0 auto; text-align: center">
+    <h2>Profile</h2>
+    <form method="post" enctype="multipart/form-data" action="{% url 'game:profile' %}" >
+        {% csrf_token %}
+        <div class="form-group mt-2">
+        {% if user.image %}
+            <img src="{{user.image.url}}" style="max-width: 100%;" class="img-thumbnail">
+        {% else %}
+            <img src="{% static 'game/avatar.jpg' %}" class="img-thumbnail">
+        {% endif %}
+        </div>
+        <div class="input-group input-group-sm mt-1 mb-2">
+            {{form.image}}
+            <div class="input-group-text">
+                {{ form.is_save_image }}
+            </div>
+        </div>
+        {% if form.errors.image %}
+            {% for err in form.errors.image %}
+                <p class="alert alert-warning py-2" role="alert" style="font-size: 16px">{{err}}</p>
+            {% endfor%}
+        {% endif %}
+        <div class="input-group mt-3 mb-2">
+            <span class="input-group-text">Login</span>
+            {{ form.login }}
+        </div>
+        {% if form.errors.login %}
+            {% for err in form.errors.login %}
+                <p class="alert alert-warning py-2" role="alert" style="font-size: 16px">{{err}}</p>
+            {% endfor%}
+        {% endif %}
+        <div class="input-group mt-3 mb-2">
+            <span class="input-group-text">Email</span>
+            {{ form.email }}
+        </div>
+        {% if form.errors.email %}
+            {% for err in form.errors.email %}
+                <p class="alert alert-warning py-2" role="alert" style="font-size: 16px">{{err}}</p>
+            {% endfor%}
+        {% endif %}
+        <input type="submit" style="width: 110px;" class="btn btn-warning mt-2 mb-4" value="Save">
+    </form>
+</div>
+
+{% endblock %}

@@ -17,7 +17,7 @@ urlpatterns = [
         auth_views.LoginView.as_view(
             authentication_form=UserLoginForm,
             template_name='game/login.html',
-            next_page='game:home',
+            next_page='game:profile',
         ),
         name='login',
     ),
@@ -25,7 +25,8 @@ urlpatterns = [
     path('accounts/signup/', views.SignUpView.as_view(), name='signup'),
     path('accounts/verify_message/', views.SignUpView.as_view(), name='verify_message'),
 
-    path('accounts/profile/', auth_views.LogoutView.as_view(next_page='game:login'), name='profile'),
+    path('accounts/profile/', views.ProfileView.as_view(), name='profile'),
+
     path('accounts/password-change/', auth_views.LoginView.as_view(template_name='game/login.html'), name='password_change'),
     path('accounts/password-change/done/', auth_views.LoginView.as_view(template_name='game/login.html'), name='password_change_done'),
     path('accounts/password_reset/', auth_views.LoginView.as_view(template_name='game/login.html'), name='password_reset'),
