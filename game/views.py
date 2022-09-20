@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views import generic
+from verify_email import send_verification_email
 
 from game.forms import UserLoginForm, UserSignupForm, UserProfileForm
 from game.models import ChanImage, CharacterName, CharacterImage
@@ -51,10 +52,20 @@ def about(request):
     return render(request, 'game/about.html', attrs)
 
 
+def verify_info(request):
+    return render(request, 'game/verify_info.html')
+
+
 class SignUpView(generic.CreateView):
     form_class = UserSignupForm
-    success_url = reverse_lazy("game:login")
+    success_url = reverse_lazy("game:verify_info")
     template_name = "game/signup.html"
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form(UserSignupForm)
+        if form.is_valid():
+            send_verification_email(request, form)
+        return super(SignUpView, self).post(request, *args, **kwargs)
 
 
 class ProfileView(generic.UpdateView):

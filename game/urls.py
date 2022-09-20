@@ -1,5 +1,5 @@
 from django.contrib.auth import views as auth_views
-from django.urls import path
+from django.urls import path, include
 
 from game import views
 from game.forms import UserLoginForm
@@ -24,7 +24,8 @@ urlpatterns = [
     path('accounts/logout/', auth_views.LogoutView.as_view(next_page='game:login'), name='logout'),
     path('accounts/signup/', views.SignUpView.as_view(), name='signup'),
     path('accounts/profile/', views.ProfileView.as_view(), name='profile'),
-    path('accounts/verify/info/', views.SignUpView.as_view(), name='verify_message'),
+    path('accounts/verify/info/', views.verify_info, name='verify_info'),
+    path('accounts/verify/', include('verify_email.urls')),
 
     path('accounts/password-change/', auth_views.LoginView.as_view(template_name='game/login.html'), name='password_change'),
     path('accounts/password-change/done/', auth_views.LoginView.as_view(template_name='game/login.html'), name='password_change_done'),
