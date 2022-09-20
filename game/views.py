@@ -66,10 +66,3 @@ class ProfileView(generic.UpdateView):
     def get_object(self, queryset=None):
         obj = self.queryset.get(pk=self.request.user.id)
         return obj
-
-    def post(self, request, *args, **kwargs):
-        if not request.POST.get('is_save_image'):
-            user = User.objects.get(id=request.user.id)
-            user.image = None
-            user.save()
-        return super().post(self, request, *args, **kwargs)

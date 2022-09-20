@@ -1,11 +1,13 @@
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import AuthenticationForm, UsernameField, UserCreationForm, UserChangeForm
 from django.core.exceptions import ValidationError
+from django.core.validators import FileExtensionValidator
 from django.utils.translation import gettext_lazy as _
 
 from django import forms
 from django.forms import EmailField, ImageField, BooleanField
 
+from guess_chan.settings import ALLOWED_EXTENSIONS
 from project.models import User
 
 
@@ -18,7 +20,6 @@ def validate_password_strength(value):
     # check for 1 digits
     if sum(c.isdigit() for c in value) < 1:
         raise ValidationError(_('Password must container at least 1 digit.'))
-
     return value
 
 
@@ -77,12 +78,24 @@ class UserProfileForm(UserChangeForm):
     image = ImageField(widget=forms.FileInput(
         attrs={'class': 'form-control form-control-sm', 'type': 'file'}),
         required=False,
+        validators=[FileExtensionValidator(allowed_extensions=ALLOWED_EXTENSIONS)]
     )
     is_save_image = BooleanField(widget=forms.CheckboxInput(
         attrs={'checked': True, 'class': 'form-check-input mt-0', 'type': 'checkbox'}),
         required=False,
+        initial=True,
     )
 
     class Meta:
         model = User
-        fields = ("login", "email", "image",)
+        fields = ("login", "email", "is_save_image", "image",)
+
+    def clean_image(self):
+        if not self.cleaned_data.get("is_save_image"):
+            if self.instance.image: self.instance.image.delete()
+            return None
+        if 'image' in self.changed_data:
+            if self.instance.image: self.instance.image.delete()
+        image = self.cleaned_data.get('image')
+        return image
+        

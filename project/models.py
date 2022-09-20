@@ -1,8 +1,10 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django_resized import ResizedImageField
 
 from common.utils import generate_filename
+from guess_chan.settings import LOGO_RESOLUTION
 from .managers import UserManager
 
 
@@ -15,7 +17,10 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     """ User model: identification by email, additional fields: first_name, last_name, father_name. """
     email = models.EmailField(unique=True, verbose_name=_('Email'))
     login = models.CharField(max_length=30, unique=True, verbose_name=_('Login'))
-    image = models.ImageField(upload_to=generate_filename, null=True, blank=True)
+    image = ResizedImageField(
+        upload_to=generate_filename, null=True, blank=True,
+        size=[LOGO_RESOLUTION, LOGO_RESOLUTION],
+    )
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
