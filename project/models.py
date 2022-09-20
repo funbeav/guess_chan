@@ -24,7 +24,6 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    is_confirmed = models.BooleanField(default=False)
     is_premium = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'login'
