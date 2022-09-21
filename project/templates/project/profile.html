@@ -1,4 +1,4 @@
-{% extends "game/base.html" %}
+{% extends "project/base.html" %}
 {% load static %}
 
 {% block title %}Sign Up{% endblock %}
@@ -7,13 +7,13 @@
 
 <div class="mt-2 col-lg-3 col-lg-offset-4" style="margin: 0 auto; text-align: center">
     <h2>Profile</h2>
-    <form method="post" enctype="multipart/form-data" action="{% url 'game:profile' %}" >
+    <form method="post" enctype="multipart/form-data" action="{% url 'project:profile' %}" >
         {% csrf_token %}
         <div class="form-group mt-2">
         {% if user.image %}
             <img src="{{user.image.url}}" style="max-width: 100%;" class="img-thumbnail">
         {% else %}
-            <img src="{% static 'game/avatar.jpg' %}" class="img-thumbnail">
+            <img src="{% static 'project/avatar.jpg' %}" class="img-thumbnail">
         {% endif %}
         </div>
         <div class="input-group input-group-sm mt-1 mb-2">
@@ -45,7 +45,7 @@
                 <p class="alert alert-warning py-2" role="alert" style="font-size: 16px">{{err}}</p>
             {% endfor%}
         {% endif %}
-        <input type="submit" style="width: 110px;" class="btn btn-warning mt-2 mb-4" value="Save">
+        <input type="submit" style="width: 110px;" class="btn btn-warning mt-2 mb-4 rounded-pill" value="Save">
     </form>
 </div>
 

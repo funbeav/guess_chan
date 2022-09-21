@@ -1,11 +1,6 @@
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
-from django.views import generic
-from verify_email import send_verification_email
-
-from game.forms import UserLoginForm, UserSignupForm, UserProfileForm
+from django.shortcuts import render
 from game.models import ChanImage, CharacterName, CharacterImage
-from project.models import User
+from project.forms import UserLoginForm
 
 
 def get_next_chan_image_for_user(user):
@@ -50,35 +45,3 @@ def about(request):
         'form': UserLoginForm(request),
     }
     return render(request, 'game/about.html', attrs)
-
-
-def verify_info(request):
-    return render(request, 'game/verify/info.html')
-
-
-class SignUpView(generic.CreateView):
-    form_class = UserSignupForm
-    template_name = "game/signup.html"
-
-    def __init__(self, **kwargs):
-        self.object = None
-        super().__init__(**kwargs)
-
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if form.is_valid():
-            send_verification_email(request, form)
-            return redirect('game:verify_info')
-        else:
-            return self.form_invalid(form)
-
-
-class ProfileView(generic.UpdateView):
-    form_class = UserProfileForm
-    success_url = reverse_lazy("game:profile")
-    template_name = "game/profile.html"
-    queryset = User.objects.all()
-
-    def get_object(self, queryset=None):
-        obj = self.queryset.get(pk=self.request.user.id)
-        return obj

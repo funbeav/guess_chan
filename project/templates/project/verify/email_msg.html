@@ -11,6 +11,7 @@
     <style>
         .format-font {
             font-family: 'Montserrat', sans-serif;
+            color: black;
         }
         .my-container {
             margin: 10px;
@@ -18,7 +19,7 @@
             padding-top: 0px;
             justify-content: center;
             border-radius: 5px;
-            border: 1px solid rgb(204, 203, 203);
+            border: 1px solid black;
         }
 
         .my-button {
@@ -26,17 +27,17 @@
             padding-left: 35px;
             padding-right: 35px;
             background-color: rgb(110, 3, 211);
-            color: white;
+            color: black;
             border-radius: 25px;
             transition-duration: 500ms;
             text-decoration: none;
-
         }
+
         .my-button:hover {
-            color: rgb(110, 3, 211);
+            color: black;
             background-color: white;
             border-radius: 0px;
-            border: 1px solid rgb(110, 3, 211);
+            border: 1px solid black;
             transition-duration: 200ms;
         }
 
@@ -46,13 +47,13 @@
 
     <div class="my-container">
 
-        <div style="background-color: rgb(110, 3, 211); border-radius: 15px;">
-            <h1 class="format-font" style="text-align: center; padding: 2px; color:white;">
+        <div style="background-color: #ffc107; border-radius: 15px;">
+            <h1 class="format-font" style="text-align: center; padding: 2px;">
                 Account Activation
             </h1>
         </div>
 
-        <h2 class="format-font" style="text-align: center;">E-mail Confirmation</h2> <hr style="background-color:  rgb(110, 3, 211); width:100px">
+        <h2 class="format-font" style="text-align: center;">E-mail Confirmation</h2> <hr style="background-color: #ffc107; width:100px">
 
         <div class="format-font" style="margin-top: 20px; line-height: 1.5;">
             <p style="text-align: center; font-weight: bold;">Greetings!</p>
@@ -62,9 +63,9 @@
 
         <p class="format-font" style="text-align: center; margin-top: 50px;">
             Please verify your e-mail :
-            <hr style="background-color:  rgb(110, 3, 211); width:50px">
+            <hr style="background-color: #ffc107; width:50px">
             <div class="format-font" style="text-align: center; margin-top: 30px;" >
-                <a href="{{ link }}" class="my-button" >Verify</a>
+                <a href="{{ link }}" class="my-button" style="background-color: #ffc107; width:100px; color:black;">Verify</a>
             </div>
 
         </p>

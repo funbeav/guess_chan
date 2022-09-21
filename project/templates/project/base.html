@@ -11,40 +11,44 @@
 <body>
     {% load static %}
     <header class="p-2 bg-dark text-white">
-        <div class="container">
-          <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-              <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
-            </a>
+        <div class="d-flex justify-content-around flex-wrap-reverse align-items-center">
 
-            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-              <li><a href="{% url 'game:home' %}" class="nav-link px-2 text-secondary">Play</a></li>
-              <li><a href="{% url 'game:about' %}" class="nav-link px-2 text-secondary">About</a></li>
-            </ul>
+            <div class="d-flex flex-row">
+              <a href="{% url 'game:home' %}" class="nav-link px-2 text-secondary">Play</a>
+              <a href="{% url 'game:about' %}" class="nav-link px-2 text-secondary">About</a>
+            </div>
 
-            <div class="text-end">
+            {% if user.is_authenticated %}
+            <div class="">
+                <a href="/" class="text-white text-decoration-none">
+                    #TODO: Add Scores & Modes
+                </a>
+            </div>
+            {% endif %}
+
+            <div class="">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'game:profile' %}" class="link-light text-decoration-none">{{ user.login }}</a>
-                    <a href="{% url 'game:profile' %}" class="link-unstyled text-decoration-none px-2">
+                    <a href="{% url 'project:profile' %}" class="link-light text-decoration-none">{{ user.login }}</a>
+                    <a href="{% url 'project:profile' %}" class="link-unstyled text-decoration-none px-2">
                         {% if user.image %}
                             <img src="{{ user.image.url }}" width="45" height="45" style="border-radius: 50%;">
                         {% else %}
-                            <img src="{% static 'game/avatar.jpg' %}" width="45" height="45" style="border-radius: 50%;">
+                            <img src="{% static 'project/avatar.jpg' %}" width="45" height="45" style="border-radius: 50%;">
                         {% endif %}
                     </a>
-                    <a href="{% url 'game:logout' %}">
+                    <a href="{% url 'project:logout' %}">
                         <button class="btn btn-outline-light btn-sm">Log Out</button>
                     </a>
                 {% else %}
-                    <a href="{% url 'game:login' %}" class="text-decoration-none">
+                    <a href="{% url 'project:login' %}" class="text-decoration-none">
                         <button class="btn btn-warning btn-sm">Log In</button>
                     </a>
-                    <a href="{% url 'game:signup' %}" class="text-decoration-none">
+                    <a href="{% url 'project:signup' %}" class="text-decoration-none">
                         <button class="btn btn-outline-warning btn-sm" >Sign Up</button>
                     </a>
                 {% endif %}
             </div>
-          </div>
+
         </div>
       </header>
 

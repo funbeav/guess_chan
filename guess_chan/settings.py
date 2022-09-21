@@ -145,5 +145,11 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_ID')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PW')
 
-LOGIN_URL = 'game:login'
-HTML_MESSAGE_TEMPLATE = './game/verify/email_msg.html'
+LOGIN_URL = 'project:login'
+HTML_MESSAGE_TEMPLATE = './project/verify/email_msg.html'
+REQUEST_NEW_EMAIL_TEMPLATE = './project/verify/request_new_email.html'
+VERIFICATION_SUCCESS_TEMPLATE = './project/verify/email_success.html'
+VERIFICATION_FAILED_TEMPLATE = './project/verify/email_fail.html'
+LINK_EXPIRED_TEMPLATE = './project/verify/link_expired.html'
+NEW_EMAIL_SENT_TEMPLATE = './project/verify/new_email_sent.html'
+MAX_RETRIES = 5

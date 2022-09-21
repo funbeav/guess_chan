@@ -1,4 +1,4 @@
-{% extends 'game/base.html' %}
+{% extends 'project/base.html' %}
 
 {% block title %}
 {{ title }}
@@ -10,5 +10,8 @@
         <h2>Please, verify your Email</h2>
     </div>
     <p>We send verification link on your email. Please, check it to confirm your account</p>
+    <p><small>
+        Don't get an email? Use <b><a class="link-dark" href="{% url 'request-new-link-from-email' %}">this link</a></b> to resend request
+    </small></p>
     </div>
 {% endblock %}
