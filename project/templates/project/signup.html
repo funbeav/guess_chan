@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<div class="mt-4 col-lg-3 col-lg-offset-4" style="margin: 0 auto; float: none; text-align: center">
+<div class="pt-5 mt-3 col-lg-3 col-lg-offset-4" style="margin: 0 auto; float: none; text-align: center">
     <h2>Sign up</h2>
     <form method="post" action="{% url 'project:signup' %}" >
         {% csrf_token %}
@@ -41,8 +41,11 @@
                 {% endfor%}
             {% endif %}
         {% endif %}
-        <input type="submit" style="width: 110px;" class="btn btn-warning mt-2" value="Sign Up">
+        <input type="submit" style="width: 110px;" class="btn btn-warning rounded-pill mt-2" value="Sign Up">
     </form>
+    <p class="form-group mt-3 mb-4">
+        <a href="{% url 'request-new-link-from-email' %}" class="link-dark">Lost verification email?</a>
+    </p>
 </div>
 </div>
 

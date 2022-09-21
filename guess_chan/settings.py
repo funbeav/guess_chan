@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'verify_email.apps.VerifyEmailConfig',
     'rest_framework',
+    'crispy_forms',
     'project',
     'game',
     'api',

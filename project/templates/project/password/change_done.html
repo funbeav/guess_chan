@@ -1,0 +1,11 @@
+{% extends "project/base.html" %}
+
+{% block content %}
+
+  <!--Password Reset Complete-->
+    <div class="container pt-5 mt-3 col-lg-5 col-lg-offset-4" style="margin: 0 auto; float: none; text-align: center">
+	    <h2 class="font-weight-bold mt-3 mb-5">Password changed</h2>
+        <a href="{% url 'project:profile' %}" class="btn btn-warning rounded-pill btn-lg">Back to Profile</a>
+    </div>
+
+{% endblock %}
