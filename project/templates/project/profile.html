@@ -9,7 +9,7 @@
     <form method="post" enctype="multipart/form-data" action="{% url 'project:profile' %}" >
         {% csrf_token %}
         <div class="form-group mt-4">
-        {% if user.image%}
+        {% if user.image %}
             <img src="{{user.image.url}}" id="frame" style="max-width: 100%;" class="img-thumbnail" onerror="this.onerror=null; this.src='{% static 'project/avatar.jpg' %}'">
         {% else %}
             <img src="{% static 'project/avatar.jpg' %}" id="frame" class="img-thumbnail">
