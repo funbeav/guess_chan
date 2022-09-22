@@ -19,6 +19,7 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(next_page='project:login'), name='logout'),
     path('signup/', views.SignUpView.as_view(), name='signup'),
     path('profile/', views.ProfileView.as_view(), name='profile'),
+    path('delete_image/', views.delete_image, name='delete_image'),
 
     path('password_reset/', views.password_reset_request, name='password_reset'),
     path(

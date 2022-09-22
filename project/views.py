@@ -19,6 +19,12 @@ def verify_info(request):
     return render(request, 'project/verify/info.html')
 
 
+def delete_image(request):
+    if request.user and request.user.image:
+        request.user.image.delete()
+    return redirect("project:profile")
+
+
 def password_reset_request(request):
     if request.method == "POST":
         password_reset_form = UserPasswordResetForm(request.POST)

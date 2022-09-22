@@ -83,24 +83,16 @@ class UserProfileForm(UserChangeForm):
     login = UsernameField(widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Login'}))
     email = EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
     image = ImageField(widget=forms.FileInput(
-        attrs={'class': 'form-control form-control-sm', 'type': 'file'}),
+        attrs={'class': 'form-control form-control-sm', 'type': 'file', 'onchange': 'preview()', 'id': 'upload'}),
         required=False,
         validators=[FileExtensionValidator(allowed_extensions=ALLOWED_EXTENSIONS)]
-    )
-    is_save_image = BooleanField(widget=forms.CheckboxInput(
-        attrs={'checked': True, 'class': 'form-check-input mt-0', 'type': 'checkbox'}),
-        required=False,
-        initial=True,
     )
 
     class Meta:
         model = User
-        fields = ("login", "email", "is_save_image", "image",)
+        fields = ("login", "email", "image",)
 
     def clean_image(self):
-        if not self.cleaned_data.get("is_save_image"):
-            if self.instance.image: self.instance.image.delete()
-            return None
         if 'image' in self.changed_data:
             if self.instance.image: self.instance.image.delete()
         image = self.cleaned_data.get('image')
