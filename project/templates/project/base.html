@@ -31,7 +31,7 @@
                     <a href="{% url 'project:profile' %}" class="link-light text-decoration-none">{{ user.login }}</a>
                     <a href="{% url 'project:profile' %}" class="link-unstyled text-decoration-none px-2">
                         {% if user.image %}
-                            <img src="{{ user.image.url }}" width="45" height="45" style="border-radius: 50%;">
+                            <img src="{{ user.image.url }}" width="45" height="45" style="border-radius: 50%;" onerror="this.onerror=null; this.src='{% static 'project/avatar.jpg' %}'">
                         {% else %}
                             <img src="{% static 'project/avatar.jpg' %}" width="45" height="45" style="border-radius: 50%;">
                         {% endif %}
