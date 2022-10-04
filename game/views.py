@@ -1,4 +1,6 @@
 from django.shortcuts import render
+
+from common.utils import deep_getattr
 from game.models import ChanImage, CharacterName, CharacterImage
 from project.forms import UserLoginForm
 
@@ -18,7 +20,7 @@ def get_answer_result(answer, chan_image_id):
     return {
         'correct': is_correct,
         'correct_answer': CharacterName.objects.filter(character=correct.chan.character, lang__alpha='en').first().name,
-        'url': CharacterImage.objects.filter(character=correct.chan.character).first().image.url,
+        'url': deep_getattr(CharacterImage.objects.filter(character=correct.chan.character).first(), 'image', 'url'),
     }
 
 
