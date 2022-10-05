@@ -1,13 +1,15 @@
 from django.shortcuts import render
 
 from common.utils import deep_getattr
+from game.generators import BatchGenerator
 from game.models import ChanImage, CharacterName, CharacterImage
+from guess_chan.settings import NORMAL_MODE
 from project.forms import UserLoginForm
 
 
-def get_next_chan_image_for_user(user):
+def get_next_chan_image_for_user(user, mode=NORMAL_MODE):
     # TO DO: create user day's chans batch if don't exist, else pick first unsolved
-    chan_image = ChanImage.objects.order_by('?').first()
+    chan_image = BatchGenerator(user, mode).get_next_chan_image()
     return chan_image
 
 
@@ -31,7 +33,7 @@ def index(request):
         image = {'id': 0, 'url': answer_result['url']}
     else:
         chan_image = get_next_chan_image_for_user(request.user)
-        image = {'id': chan_image.id, 'url': chan_image.image.url}
+        image = {'id': chan_image.id, 'url': deep_getattr(chan_image, 'image', 'url')}
     attrs = {
         'user': request.user,
         'form': UserLoginForm(request),

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from game.models import Chan, CharacterName, ChanImage, Character, CharacterImage
+from game.models import Chan, CharacterName, ChanImage, Character, CharacterImage, UserChanBatch
 
 
 class ImagePreviewInline(admin.StackedInline):
@@ -75,3 +75,8 @@ class CharacterAdmin(admin.ModelAdmin):
 @admin.register(CharacterName)
 class CharacterNameAdmin(admin.ModelAdmin):
     list_display = ('character', 'name', 'lang',)
+
+
+@admin.register(UserChanBatch)
+class UserChanBatch(admin.ModelAdmin):
+    list_display = ('user', 'chan', 'time', 'mode', 'is_solved',)

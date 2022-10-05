@@ -27,8 +27,8 @@
                     {% else %}
                         <h2 class="text-danger">{{ answer_result.correct_answer }}</h2>
                     {% endif %}
-                        <a href="{% url 'game:home' %}">
-                            <input class="btn btn-primary mt-2 mb-3 rounded-pill" style="width: 110px;" value="Next">
+                        <a href="{% url 'game:home' %}" class="btn btn-primary mt-2 mb-3 rounded-pill" style="width: 110px;">
+                            Next
                         </a>
                     </div>
                 {% else %}

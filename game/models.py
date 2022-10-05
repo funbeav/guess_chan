@@ -3,7 +3,8 @@ from PIL import Image
 from django.db import models
 
 from common.utils import generate_filename
-from project.models import Lang
+from guess_chan.settings import DIFFICULTY_MODES, NORMAL_MODE
+from project.models import Lang, User
 
 
 class BaseImage(models.Model):
@@ -35,6 +36,17 @@ class CharacterImage(BaseImage):
         return 'character'
 
 
+class CharacterName(models.Model):
+    """ Acceptable Character's names """
+
+    character = models.ForeignKey(Character, on_delete=models.CASCADE)
+    name = models.CharField(max_length=50, unique=True)
+    lang = models.ForeignKey(Lang, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.character.name} ~ {self.name}'
+
+
 class Chan(models.Model):
     name = models.CharField(max_length=50, unique=True)
     character = models.OneToOneField(Character, on_delete=models.SET_NULL, null=True, blank=True)
@@ -51,12 +63,9 @@ class ChanImage(BaseImage):
         return 'chan'
 
 
-class CharacterName(models.Model):
-    """ Acceptable Character's names """
-
-    character = models.ForeignKey(Character, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50, unique=True)
-    lang = models.ForeignKey(Lang, on_delete=models.SET_NULL, null=True, blank=True)
-
-    def __str__(self):
-        return f'{self.character.name} ~ {self.name}'
+class UserChanBatch(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)     # null=True means general Chan of the Day
+    chan = models.ForeignKey(Chan, on_delete=models.CASCADE)
+    time = models.DateTimeField(auto_now_add=True)
+    mode = models.CharField(max_length=6, choices=DIFFICULTY_MODES, default=NORMAL_MODE)
+    is_solved = models.BooleanField(default=False)
