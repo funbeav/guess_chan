@@ -1,6 +1,9 @@
+import datetime
+
 import imagehash
 from PIL import Image
 from django.db import models
+from django.utils import timezone
 
 from common.utils import generate_filename
 from guess_chan.settings import DIFFICULTY_MODES, NORMAL_MODE
@@ -62,10 +65,17 @@ class ChanImage(BaseImage):
     def image_folder(self):
         return 'chan'
 
+    def __str__(self):
+        return f'[{self.pk}] {self.chan.name} Image'
 
-class UserChanBatch(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)     # null=True means general Chan of the Day
+
+class UserChanImageAttempt(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     chan = models.ForeignKey(Chan, on_delete=models.CASCADE)
-    time = models.DateTimeField(auto_now_add=True)
+    chan_image = models.ForeignKey(ChanImage, on_delete=models.CASCADE)
+
+    created = models.DateTimeField(default=timezone.now)
     mode = models.CharField(max_length=6, choices=DIFFICULTY_MODES, default=NORMAL_MODE)
+
     is_solved = models.BooleanField(default=False)
+    is_pending = models.BooleanField(default=True)

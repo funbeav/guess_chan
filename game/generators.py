@@ -1,12 +1,15 @@
 import random
 
-from datetime import datetime, timedelta, time
+from datetime import timedelta
 
-from game.models import ChanImage, UserChanBatch
+from django.db.models import Q
+from django.utils import timezone
+
+from game.models import ChanImage, UserChanImageAttempt, Chan
 from guess_chan.settings import NORMAL_MODE, EASY_MODE, HARD_MODE
 
 
-class BatchGenerator:
+class ChanImageGenerator:
     """Generates Chan Batches for current user"""
 
     BATCH_LENGTH = {
@@ -18,31 +21,70 @@ class BatchGenerator:
     def __init__(self, user, mode=NORMAL_MODE):
         self.user = user
         self.mode = mode
-        self.chan_images = self._get_chan_images()
 
     def get_next_chan_image(self):
-        return self.chan_images[0]
+        return self._get_chan_image()
 
-    def _get_chan_images(self):
-        """Get or create batch with Chans (maybe better ChanImages?) for User. (!TO DO!) No Chan repeat in each batch"""
+    def _get_chan_image(self):
+        """Get chan image from UserChanImageAttempt"""
         # TO DO: cache already gotten self.chan_images
-        today = datetime.now().date()
-        tomorrow = today + timedelta(1)
-        batch_query = UserChanBatch.objects.filter(
+        result_chan_image = None
+
+        # Get pending chan image
+        if pending_chan_attempt := UserChanImageAttempt.objects.filter(
             user=self.user,
             mode=self.mode,
-            time__gte=datetime.combine(today, time()),
-            time__lte=datetime.combine(tomorrow, time()),
-        )
-        if not batch_query.exists():
-            # TO DO: exclude passed long ago chan_images (ChanImageLog?)
-            result_chan_images = ChanImage.objects.order_by('?')[:self.BATCH_LENGTH[self.mode]]
-            UserChanBatch.objects.bulk_create([
-                UserChanBatch(user=self.user, mode=self.mode, chan=chan_image.chan)
-                for chan_image in result_chan_images
-            ])
-        else:
-            unsolved_chans_ids = batch_query.filter(is_solved=False).values_list('chan', flat=True).order_by('?')
-            # TO DO: exclude passed chan_images (ChanImageLog)
-            result_chan_images = ChanImage.objects.filter(chan_id__in=unsolved_chans_ids).order_by('?')
-        return result_chan_images
+            is_pending=True,
+        ).first():
+            result_chan_image = pending_chan_attempt.chan_image
+
+        # Get chan image from previous attempt (with 10% chance)
+        if not result_chan_image and self._is_show_previous_attempt():
+            yesterday = timezone.localtime(timezone.now()) - timedelta(days=1)
+            result_chan_image = self._get_unsolved_chan_image(created_lte=yesterday)
+
+        # Create new attempt
+        if not result_chan_image:
+            showed_chans_ids = UserChanImageAttempt.objects.filter(
+                user=self.user,
+                mode=self.mode,
+            ).values_list('chan__id', flat=True)
+            new_chan = Chan.objects.filter(
+                ~Q(id__in=showed_chans_ids),
+            ).order_by('?').first()
+            if new_chan:
+                result_chan_image = ChanImage.objects.filter(chan=new_chan).order_by('?').first()
+                UserChanImageAttempt.objects.create(
+                    user=self.user,
+                    mode=self.mode,
+                    chan=new_chan,
+                    chan_image=result_chan_image,
+                )
+
+        # Get chan image from previous attempts if out of chans
+        if not result_chan_image:
+            result_chan_image = self._get_unsolved_chan_image(
+                created_lte=timezone.localtime(timezone.now()),
+            )
+
+        return result_chan_image
+
+    @staticmethod
+    def _is_show_previous_attempt():
+        return random.randint(1, 10) == 1   # 10% chance
+
+    def _get_unsolved_chan_image(self, created_lte):
+        """Get unsolved chans from the past (<= created_lte)"""
+        unsolved_attempt = UserChanImageAttempt.objects.filter(
+            user=self.user,
+            mode=self.mode,
+            is_solved=False,
+            created__lte=created_lte,
+        ).order_by('?').first()
+        if unsolved_attempt:
+            unsolved_attempt.is_pending = True
+            unsolved_attempt.save()
+            return ChanImage.objects.filter(
+                chan=unsolved_attempt.chan,
+            ).order_by('?').first() if unsolved_attempt else None
+        return None

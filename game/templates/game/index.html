@@ -42,7 +42,11 @@
                 {% endif %}
             </form>
         {% else %}
-            <p>Записи отсутствуют!</p>
+            {% if image.error %}
+                <p>{{ image.error }}</p>
+            {% else %}
+                <p>Image not found</p>
+            {% endif %}
         {% endif %}
     </div>
 {% endblock %}
