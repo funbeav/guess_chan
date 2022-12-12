@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AnonymousUser
+from django.db.models import F
 from django.shortcuts import render
 
 from common.utils import deep_getattr
@@ -6,6 +7,7 @@ from game.generators import ChanImageGenerator
 from game.models import ChanImage, CharacterName, CharacterImage, UserChanImageAttempt
 from guess_chan.settings import NORMAL_MODE
 from project.forms import UserLoginForm
+from project.models import User
 
 
 def get_next_chan_image_for_user(user, mode=NORMAL_MODE):
@@ -21,6 +23,11 @@ def get_next_chan_image_for_user(user, mode=NORMAL_MODE):
     return chan_image, message
 
 
+def decrement_energy(user):
+    user.energy -= 1
+    user.save()
+
+
 def get_answer_result(user, answer, chan_image_id):
     is_correct_answer = False
     answered = CharacterName.objects.filter(name__iexact=answer).first()
@@ -30,11 +37,13 @@ def get_answer_result(user, answer, chan_image_id):
         chan_image_id=chan_image_id,
         is_pending=True,
     ).first()
-    if answered and correct and answered.character == correct.chan.character:
-        chan_image_attempt.is_solved = True
-        is_correct_answer = True
-    chan_image_attempt.is_pending = False
-    chan_image_attempt.save()
+    if chan_image_attempt:
+        decrement_energy(user)
+        if answered and correct and answered.character == correct.chan.character:
+            chan_image_attempt.is_solved = True
+            is_correct_answer = True
+        chan_image_attempt.is_pending = False
+        chan_image_attempt.save()
     return {
         'correct': is_correct_answer,
         'correct_answer': CharacterName.objects.filter(character=correct.chan.character, lang__alpha='en').first().name,

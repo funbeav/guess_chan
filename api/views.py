@@ -5,8 +5,10 @@ from project.models import User
 
 
 class UserListViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated,
-                          permissions.IsAdminUser]
+    permission_classes = [
+        permissions.IsAuthenticated,
+        permissions.IsAdminUser,
+    ]
     serializer_class = UserSerializer
     queryset = User.objects.all()
 

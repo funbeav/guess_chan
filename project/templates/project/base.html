@@ -20,16 +20,14 @@
             </div>
 
             {% if user.is_authenticated %}
-            <div class="">
-                <a href="/" class="text-white text-decoration-none">
-                    #TODO: Add Scores & Modes
-                </a>
+            <div class="d-flex flex-row">
+                Energy: {{ user.energy }}
             </div>
             {% endif %}
 
-            <div class="">
+            <div class="d-flex flex-row">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'project:profile' %}" class="link-light text-decoration-none">{{ user.login }}</a>
+                    <a href="{% url 'project:profile' %}" class="nav-link text-light px-1">{{ user.login }}</a>
                     <a href="{% url 'project:profile' %}" class="link-unstyled text-decoration-none px-2">
                         {% if user.image %}
                             <img src="{{ user.image.url }}" width="45" height="45" style="border-radius: 50%;" onerror="this.onerror=null; this.src='{% static 'project/avatar.jpg' %}'">
@@ -37,7 +35,7 @@
                             <img src="{% static 'project/avatar.jpg' %}" width="45" height="45" style="border-radius: 50%;">
                         {% endif %}
                     </a>
-                    <a href="{% url 'project:logout' %}">
+                    <a href="{% url 'project:logout' %}" class="py-1">
                         <button class="btn btn-outline-light btn-sm">Log Out</button>
                     </a>
                 {% else %}

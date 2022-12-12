@@ -22,14 +22,16 @@
             <form method="post" action="{% url 'game:home' %}" >
                 {% csrf_token %}
                 {% if answer_result %}
-                    <div class="form-group mt-3">
+                    <div class="form-group mt-3 align-items-center">
                     {% if answer_result.correct %}
                     {% else %}
-                        <h2 class="text-danger">{{ answer_result.correct_answer }}</h2>
+                        <h2 class="text-danger text-center">{{ answer_result.correct_answer }}</h2>
                     {% endif %}
-                        <a href="{% url 'game:home' %}" class="btn btn-primary mt-2 mb-3 rounded-pill" style="width: 110px;">
-                            Next
-                        </a>
+                        <div class="align-items-center text-center">
+                            <a href="{% url 'game:home' %}" class="btn btn-primary mt-2 mb-3 rounded-pill" style="width: 110px;">
+                                Next
+                            </a>
+                        </div>
                     </div>
                 {% else %}
                     <div class="form-group mt-3">
