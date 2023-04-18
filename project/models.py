@@ -37,6 +37,10 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     def image_folder(self):
         return 'user'
 
+    def change_energy(self, energy: int):
+        self.energy += energy
+        self.save()
+
     def __str__(self):
         return f'{self.login}'
 

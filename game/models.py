@@ -6,7 +6,7 @@ from django.db import models
 from django.utils import timezone
 
 from common.utils import generate_filename
-from guess_chan.settings import DIFFICULTY_MODES, NORMAL_MODE
+from game.constants import DIFFICULTY_MODES, NORMAL_MODE
 from project.models import Lang, User
 
 
@@ -79,3 +79,4 @@ class UserChanImageAttempt(models.Model):
 
     is_solved = models.BooleanField(default=False)
     is_pending = models.BooleanField(default=True)
+    is_shown = models.BooleanField(default=False)

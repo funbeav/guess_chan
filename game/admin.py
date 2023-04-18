@@ -79,4 +79,4 @@ class CharacterNameAdmin(admin.ModelAdmin):
 
 @admin.register(UserChanImageAttempt)
 class UserChanImageAttemptAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'user', 'chan', 'chan_image', 'created', 'mode', 'is_pending', 'is_solved',)
+    list_display = ('pk', 'user', 'chan', 'chan_image', 'created', 'mode', 'is_pending', 'is_solved', 'is_shown',)
