@@ -39,9 +39,12 @@ class GameViewSet(viewsets.ModelViewSet):
         return ChanImageResultSerializer
 
     def get_chan_image_result(self, request):
-        game = GameProcessor(user=request.user)
-        chan_image_result = game.get_chan_image_result()
-        serializer = self.get_serializer(chan_image_result)
+        try:
+            game = GameProcessor(user=request.user)
+            chan_image_result = game.get_chan_image_result()
+            serializer = self.get_serializer(chan_image_result)
+        except Exception as exc:
+            raise APIException(exc)
         return Response(serializer.data)
 
     def get_answer_result(self, request):
@@ -49,12 +52,12 @@ class GameViewSet(viewsets.ModelViewSet):
         if not chan_image_id_to_guess:
             raise APIException("Chan Image ID is not provided")
         given_answer = request.data.get('given_answer')
-        need_to_show_correct_answer = request.data.get('need_to_show_correct_answer', False)
+        show_correct_answer = request.data.get('show_correct_answer', False)
 
         try:
-            game = GameProcessor(user=request.user, show_correct_answer=need_to_show_correct_answer)
+            game = GameProcessor(user=request.user, show_correct_answer=show_correct_answer)
             answer_result = game.process_answer(given_answer, int(chan_image_id_to_guess))
-            serializer = self.get_serializer(data=answer_result.__dict__)
+            serializer = self.get_serializer(answer_result, data=answer_result.__dict__)
             serializer.is_valid(raise_exception=True)
             return Response(serializer.data)
         except Exception as exc:
