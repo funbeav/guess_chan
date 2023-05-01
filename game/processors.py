@@ -58,7 +58,7 @@ class GameProcessor:
                 chan_image_last_not_shown_attempt.is_shown = True
                 chan_image_last_not_shown_attempt.save()
             else:
-                raise Exception(f"Chan was already shown")
+                raise Exception(f"Chan for this Chan Image [{correct_chan_image.id}] was already shown")
 
         if answer_result.is_correct or self.show_correct_answer:
             answer_result.correct_answer = CharacterName.objects.filter(
