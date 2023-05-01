@@ -18,8 +18,8 @@
             {% else %}
                 <h2 class="text-danger">Incorrect :(</h2>
                 {% if answer_result.correct_answer %}
-                    <a href="{{ answer_result.correct_answer.image_url }}"><img src="{{ answer_result.correct_answer.image_url }}" height="400px"/></a>
-                    <h2 class="text-danger text-center">{{ answer_result.correct_answer.text }}</h2>
+                    <a href="{{ answer_result.character_image_url }}"><img src="{{ answer_result.character_image_url }}" height="400px"/></a>
+                    <h2 class="text-danger text-center">{{ answer_result.correct_answer }}</h2>
                 {% else %}
                     <form method="post" action="{% url 'game:home' %}" >
                         {% csrf_token %}

@@ -3,13 +3,16 @@ from typing import Optional
 
 
 @dataclass
-class CorrectAnswer:
-    text: str = ''
-    image_url: str = ''
+class AnswerResult:
+    chan_image_id: int = None
+    is_correct: bool = False
+    given_answer: str = ''
+    correct_answer: Optional[str] = None
+    character_image_url: Optional[str] = None
 
 
 @dataclass
-class AnswerResult:
-    is_correct: bool
-    given_answer: str
-    correct_answer: Optional[CorrectAnswer]
+class ChanImageResult:
+    chan_image_id: Optional[int] = None
+    chan_image_url: Optional[str] = None
+    message: str = ''
