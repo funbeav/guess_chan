@@ -40,7 +40,7 @@ class CharacterImage(BaseImage):
 
 
 class CharacterName(models.Model):
-    """ Acceptable Character's names """
+    """Acceptable Character's name"""
 
     character = models.ForeignKey(Character, on_delete=models.CASCADE)
     name = models.CharField(max_length=50, unique=True)
@@ -52,7 +52,7 @@ class CharacterName(models.Model):
 
 class Chan(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    character = models.OneToOneField(Character, on_delete=models.SET_NULL, null=True, blank=True)
+    character = models.OneToOneField(Character, on_delete=models.SET_NULL, null=True, blank=True, related_name='chan')
 
     def __str__(self):
         return f'[{self.pk}] {self.name}'
@@ -80,3 +80,7 @@ class UserChanImageAttempt(models.Model):
     is_solved = models.BooleanField(default=False)
     is_pending = models.BooleanField(default=True)
     is_shown = models.BooleanField(default=False)
+
+    def save(self, commit: bool = True, *args, **kwargs):
+        if commit:
+            super().save(*args, **kwargs)

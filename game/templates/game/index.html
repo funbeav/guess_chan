@@ -10,6 +10,7 @@
             {% if answer_result.is_correct %}
                 <h2 class="text-primary">Correct!</h2>
                 <a href="{{ image.url }}"><img src="{{ image.url }}" height="400px"/></a>
+                <h2 class="text-primary text-center mt-2">{{ answer_result.correct_answer }}</h2>
                 <div class="align-items-center text-center">
                     <a href="{% url 'game:home' %}" class="btn btn-primary mt-2 mb-3 rounded-pill" style="width: 110px;">
                         Next
@@ -19,7 +20,7 @@
                 <h2 class="text-danger">Incorrect :(</h2>
                 {% if answer_result.correct_answer %}
                     <a href="{{ answer_result.character_image_url }}"><img src="{{ answer_result.character_image_url }}" height="400px"/></a>
-                    <h2 class="text-danger text-center">{{ answer_result.correct_answer }}</h2>
+                    <h2 class="text-danger text-center mt-2">{{ answer_result.correct_answer }}</h2>
                 {% else %}
                     <form method="post" action="{% url 'game:home' %}" >
                         {% csrf_token %}
@@ -48,6 +49,19 @@
                         <input type="text" name="answer" class="form-control text-center">
                         <input type="hidden" name="image_id" class="form-control" value="{{ image.id }}">
                     </div>
+                    {% if image.words_lengths and image.letters %}
+                        <div class="form-group text-center mt-3">
+                            Words lengths:
+                            {% for words_length in image.words_lengths %}
+                                {{ words_length }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                            <br>
+                            Letters:
+                            {% for letter in image.letters %}
+                                {{ letter }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                     <div class="form-group d-flex flex-column align-items-center mt-3 mb-3">
                         <input type="submit" class="btn btn-danger rounded-pill" style="width: 110px;" value="Guess!">
                     </div>

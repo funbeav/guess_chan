@@ -6,19 +6,40 @@ from typing import Optional
 from django.db.models import Subquery, Q
 from django.utils import timezone
 
-from game.constants import NORMAL_MODE
-from game.models import Chan, ChanImage, UserChanImageAttempt
+from game.constants import NORMAL_MODE, DEFAULT_LANG
+from game.models import Chan, ChanImage, UserChanImageAttempt, CharacterName
+from project.models import User, Lang
 
 
 class ChanImageGenerator:
     """Generates Chan Batches for current user"""
 
-    def __init__(self, user, mode=NORMAL_MODE):
+    def __init__(self, user: User, mode=NORMAL_MODE):
         self.user = user
         self.mode = mode
+        self.chan_image = None
+
+    def get_chan_name_by_chan_image(self, alpha2: str = None) -> str:
+        """Get Chan name by Chan Image with alpha2 lang"""
+        if not self.chan_image:
+            return ''
+
+        alpha2 = alpha2 or getattr(self.user, 'lang', None) or DEFAULT_LANG
+        lang = Lang.objects.filter(alpha2=alpha2).first()
+        if not lang:
+            return ''
+
+        character_name = CharacterName.objects.filter(
+            character__chan=self.chan_image.chan,
+            lang=lang,
+        ).first()
+
+        return character_name.name if character_name else ''
 
     def get_next_chan_image(self) -> Optional[ChanImage]:
-        return self._get_chan_image()
+        if not self.chan_image:
+            self.chan_image = self._get_chan_image()
+        return self.chan_image
 
     def _get_chan_image(self) -> Optional[ChanImage]:
         """Get chan image from UserChanImageAttempt"""
@@ -103,3 +124,21 @@ class ChanImageGenerator:
             return chan_image
 
         return None
+
+
+class ShuffledWordsLettersGenerator:
+    """Class for generating letters shuffled with random symbols"""
+    _min_len = 6
+    _max_len = 12
+
+    def __init__(self, lang: str):
+        self.lang = lang
+
+    def get_result_letters(self, source_string: str):
+        words_lengths = [len(word) for word in source_string.strip().split(' ')]
+        result_letters = [ch for ch in list(source_string.upper()) if ch.strip()]
+        random.shuffle(result_letters)
+        return {
+            'words_lengths': words_lengths,
+            'letters': result_letters,
+        }

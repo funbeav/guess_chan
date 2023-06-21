@@ -28,17 +28,21 @@ def index(request):
         }
     # GET for getting next Chan
     else:
-        chan_image_id, chan_image_url = None, None
+        chan_image_id, chan_image_url, words_lengths, letters = None, None, None, None
         try:
             result = game.get_chan_image_result()
             chan_image_id = result.chan_image_id
             chan_image_url = result.chan_image_url
+            words_lengths = result.words_lengths
+            letters = result.letters
         except Exception as exc:
             message = exc
         image = {
             'id': chan_image_id,
             'url': chan_image_url,
             'message': message,
+            'words_lengths': words_lengths,
+            'letters': letters,
         }
 
     attrs = {

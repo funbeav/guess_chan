@@ -9,3 +9,5 @@ DIFFICULTY_MODES = (
     (NORMAL_MODE, 'Normal'),
     (HARD_MODE, 'Hard'),
 )
+
+DEFAULT_LANG = 'en'

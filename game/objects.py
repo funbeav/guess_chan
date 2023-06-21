@@ -15,4 +15,6 @@ class AnswerResult:
 class ChanImageResult:
     chan_image_id: Optional[int] = None
     chan_image_url: Optional[str] = None
+    letters: Optional[list] = None
+    words_letters_len: int = None
     message: str = ''

@@ -27,6 +27,7 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         size=[LOGO_RESOLUTION, LOGO_RESOLUTION],
     )
     energy = models.IntegerField(default=10)
+    lang = models.CharField(max_length=2, verbose_name=_('Language'), default='en')
 
     USERNAME_FIELD = 'login'
     REQUIRED_FIELDS = ['email']
@@ -46,8 +47,8 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
 
 
 class Lang(models.Model):
-    alpha = models.CharField(max_length=5, unique=True)
+    alpha2 = models.CharField(max_length=5, unique=True)
     name = models.CharField(max_length=30)
 
     def __str__(self):
-        return f'{self.name} ({self.alpha})'
+        return f'{self.name} ({self.alpha2})'

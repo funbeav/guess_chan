@@ -10,4 +10,4 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Lang)
 class LangAdmin(admin.ModelAdmin):
-    list_display = ('name', 'alpha',)
+    list_display = ('name', 'alpha2',)
