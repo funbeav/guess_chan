@@ -1,50 +1,55 @@
+from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import render
 
-from game.forms import UserLoginForm
-from game.models import ChanImage, CharacterName, CharacterImage
-
-
-def get_next_chan_image_for_user(user):
-    # TO DO: create user day's chans batch if don't exist, else pick first unsolved
-    chan_image = ChanImage.objects.order_by('?').first()
-    return chan_image
-
-
-def get_answer_result(answer, chan_image_id):
-    is_correct = False
-    answered = CharacterName.objects.filter(name__iexact=answer).first()
-    correct = ChanImage.objects.filter(id=chan_image_id).first()
-    if answered and correct and answered.character == correct.chan.character:
-        is_correct = True
-    return {
-        'correct': is_correct,
-        'correct_answer': CharacterName.objects.filter(character=correct.chan.character, lang__alpha='en').first().name,
-        'url': CharacterImage.objects.filter(character=correct.chan.character).first().image.url,
-    }
+from game.processors import GameProcessor
+from project.forms import UserLoginForm
 
 
 def index(request):
-    answer_result = None
+    user = request.user if not isinstance(request.user, AnonymousUser) else None
+    answer_result, message = None, None
+    show_correct_answer = request.POST.get('show_correct_answer', False)
+    game = GameProcessor(user=user, show_correct_answer=show_correct_answer)
+
+    # POST for guessing last pending Chan
     if request.method == 'POST':
-        answer_result = get_answer_result(
-            request.POST['answer'],
-            request.POST['image_id'],
-        )
+        given_answer = request.POST['answer']
+        image_id_to_guess = request.POST['image_id']
+        try:
+            answer_result = game.process_answer(given_answer, image_id_to_guess)
+        except Exception as exc:
+            message = exc
         image = {
-            'id': 0,
-            'url': answer_result['url'],
+            'id': request.POST['image_id'],
+            'url': answer_result.character_image_url if answer_result and (
+                answer_result.is_correct or game.show_correct_answer
+            ) else None,
+            'message': message,
         }
+    # GET for getting next Chan
     else:
-        chan_image = get_next_chan_image_for_user(request.user)
+        chan_image_id, chan_image_url, words_lengths, letters = None, None, None, None
+        try:
+            result = game.get_chan_image_result()
+            chan_image_id = result.chan_image_id
+            chan_image_url = result.chan_image_url
+            words_lengths = result.words_lengths
+            letters = result.letters
+        except Exception as exc:
+            message = exc
         image = {
-            'id': chan_image.id,
-            'url': chan_image.image.url,
+            'id': chan_image_id,
+            'url': chan_image_url,
+            'message': message,
+            'words_lengths': words_lengths,
+            'letters': letters,
         }
+
     attrs = {
         'user': request.user,
         'form': UserLoginForm(request),
         'image': image,
-        'answer_result': answer_result,
+        'answer_result': answer_result.__dict__ if answer_result else None,
     }
     return render(request, 'game/index.html', attrs)
 

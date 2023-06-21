@@ -3,7 +3,7 @@ from pathlib import Path
 import environs
 
 
-# Import the environment variables
+# Environment variables
 env = environs.Env()
 env.read_env()
 
@@ -31,7 +31,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'verify_email.apps.VerifyEmailConfig',
     'rest_framework',
+    'crispy_forms',
     'project',
     'game',
     'api',
@@ -73,8 +75,12 @@ WSGI_APPLICATION = 'guess_chan.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.environ.get('POSTGRES_DB'),
+        'HOST': os.environ.get('POSTGRES_HOST'),
+        'PORT': os.environ.get('POSTGRES_PORT'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
     }
 }
 
@@ -84,13 +90,10 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'OPTIONS': {
+           'min_length': 5,
+        },
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
@@ -103,7 +106,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Minsk'
 
 USE_I18N = True
 
@@ -133,8 +136,26 @@ REST_FRAMEWORK = {
     # ]
 }
 
-# Base url to serve media files
+# Media settings
 MEDIA_URL = '/media/'
-
-# Path where media is stored
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+ALLOWED_EXTENSIONS = ['jpg', 'png', 'jpeg', 'gif']
+LOGO_RESOLUTION = 500
+IMAGE_RESOLUTION = 500
+
+# Email sending settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('EMAIL_ID')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PW')
+
+LOGIN_URL = 'project:login'
+HTML_MESSAGE_TEMPLATE = './project/verify/email_msg.html'
+REQUEST_NEW_EMAIL_TEMPLATE = './project/verify/request_new_email.html'
+VERIFICATION_SUCCESS_TEMPLATE = './project/verify/email_success.html'
+VERIFICATION_FAILED_TEMPLATE = './project/verify/email_fail.html'
+LINK_EXPIRED_TEMPLATE = './project/verify/link_expired.html'
+NEW_EMAIL_SENT_TEMPLATE = './project/verify/new_email_sent.html'
+MAX_RETRIES = 5

@@ -1,0 +1,29 @@
+{% extends 'project/base.html' %}
+
+{% block title %}Forgot Your Password?{% endblock %}
+
+{% block content %}
+
+	{% load crispy_forms_tags %}
+
+	<!--Reset Password-->
+	<div class="container pt-5 mt-3 col-lg-5 col-lg-offset-4" style="margin: 0 auto; float: none; text-align: center">
+  	 	<h2 class="font-weight-bold mb-3">Reset Password</h2>
+		<p>Enter your email address below, and we'll email instructions for setting a new one.</p>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="input-group mt-4 mb-2 text-center" style="width:60%; margin: auto">
+                {{ password_reset_form.email }}
+            </div>
+            {% if password_reset_form.errors.email %}
+                {% for err in password_reset_form.errors.email %}
+                    <p class="alert alert-warning py-2 px-auto mb-1" role="alert" style="font-size: 16px; margin: auto; width:50%;">
+                        {{err}} <br>
+                    </p>
+                {% endfor%}
+            {% endif %}
+            <button class="btn btn-warning rounded-pill mt-3 btn-lg" type="submit">Send Email</button>
+        </form>
+  	</div>
+
+{% endblock %}

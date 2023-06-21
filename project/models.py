@@ -1,8 +1,10 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from django_resized import ResizedImageField
 
 from common.utils import generate_filename
+from guess_chan.settings import LOGO_RESOLUTION
 from .managers import UserManager
 
 
@@ -15,34 +17,38 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     """ User model: identification by email, additional fields: first_name, last_name, father_name. """
     email = models.EmailField(unique=True, verbose_name=_('Email'))
     login = models.CharField(max_length=30, unique=True, verbose_name=_('Login'))
-    image = models.ImageField(upload_to=generate_filename, null=True, blank=True)
 
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    is_confirmed = models.BooleanField(default=False)
     is_premium = models.BooleanField(default=False)
+
+    image = ResizedImageField(
+        upload_to=generate_filename, null=True, blank=True,
+        size=[LOGO_RESOLUTION, LOGO_RESOLUTION],
+    )
+    energy = models.IntegerField(default=10)
+    lang = models.CharField(max_length=2, verbose_name=_('Language'), default='en')
 
     USERNAME_FIELD = 'login'
     REQUIRED_FIELDS = ['email']
 
     objects = UserManager()
 
-    def save(self, *args, **kwargs):
-        if self.password is not None:
-            self.set_password(self.password)
-        super().save(*args, **kwargs)
-
     @property
     def image_folder(self):
         return 'user'
+
+    def change_energy(self, energy: int):
+        self.energy += energy
+        self.save()
 
     def __str__(self):
         return f'{self.login}'
 
 
 class Lang(models.Model):
-    alpha = models.CharField(max_length=5, unique=True)
+    alpha2 = models.CharField(max_length=5, unique=True)
     name = models.CharField(max_length=30)
 
     def __str__(self):
-        return f'{self.name} ({self.alpha})'
+        return f'{self.name} ({self.alpha2})'

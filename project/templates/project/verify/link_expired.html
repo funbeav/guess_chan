@@ -1,0 +1,49 @@
+{% extends "project/verify/email_index.html" %}
+
+{%block content%}
+
+
+<div class="container" style="
+    height: auto;
+    margin-bottom: 0px;
+    margin-top: 100px;
+    border: 0px solid red;
+    background-color: rgb(255, 255, 255);
+    border-radius: 20px;
+    box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+
+    ">
+
+
+    <div class="row" style="height: auto; border: 0px solid green;">
+        <div class="col" style="width: auto; border: 0px solid red;">
+            <div class="container" style="border: 0px solid; margin-top: 200px; padding-bottom: 10px;">
+                <h1 style="font-family: 'Mulish', sans-serif; text-align: center; color: black; font-size: calc(25px + 4vw);">
+                    {{status}}
+                </h1>
+            </div>
+            <hr style="background-color: white; width: 150px;">
+
+            <div class="container" style="border: 0px solid;">
+                <h1 style="font-family: 'Mulish', sans-serif; text-align: center; color: black; font-size: calc(15px + 1.5vw);">
+                    Link Expired!
+                </h1>
+            </div>
+
+            <div class="mt-5">
+                <h1 style="font-family: 'Mulish', sans-serif; text-align: center; color: black; font-size: calc(15px + .5vw);">
+                    The link has lived its life :( Can not validate a dead link...
+                </h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-center" style="padding: 50px">
+        <a href="{% url 'project:request-new-link-from-token' encoded_email encoded_token %}" class="btn btn-primary"
+           style="align-items: center; border-radius: 20px; margin-left: 10px; margin-right: 10px;">
+            Request Another one
+        </a>
+    </div>
+</div>
+
+{% endblock %}

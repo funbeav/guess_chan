@@ -1,0 +1,52 @@
+{% extends "project/base.html" %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+
+<div class="pt-5 mt-3 col-lg-3 col-lg-offset-4" style="margin: 0 auto; float: none; text-align: center">
+    <h2>Sign up</h2>
+    <form method="post" action="{% url 'project:signup' %}" >
+        {% csrf_token %}
+        <div class="form-group mt-4 mb-2">
+            {{ form.login }}
+        </div>
+        {% if form.errors.login %}
+            {% for err in form.errors.login %}
+                <p class="alert alert-warning py-2" role="alert" style="font-size: 16px">{{err}}</p>
+            {% endfor%}
+        {% endif %}
+        <div class="form-group mt-3 mb-2">
+            {{ form.email }}
+        </div>
+        {% if form.errors.email %}
+            {% for err in form.errors.email %}
+                <p class="alert alert-warning py-2" role="alert" style="font-size: 16px">{{err}}</p>
+            {% endfor%}
+        {% endif %}
+        <div class="form-group mt-3 mb-2">
+            {{ form.password1 }}
+        </div>
+        <div class="form-group mt-3 mb-3">
+            {{ form.password2 }}
+        </div>
+        {% if form.errors.password1 %}
+            {% for err in form.errors.password1 %}
+                <p class="alert alert-warning py-2" role="alert" style="font-size: 16px; display:inline-block;">{{err}}</p>
+            {% endfor%}
+        {% else %}
+            {% if form.errors.password2 %}
+                {% for err in form.errors.password2 %}
+                    <p class="alert alert-warning py-2" role="alert" style="font-size: 16px; display:inline-block;">{{err}}</p>
+                {% endfor%}
+            {% endif %}
+        {% endif %}
+        <input type="submit" style="width: 110px;" class="btn btn-warning rounded-pill mt-2" value="Sign Up">
+    </form>
+    <p class="form-group mt-3 mb-4">
+        <a href="{% url 'request-new-link-from-email' %}" class="link-dark">Lost verification email?</a>
+    </p>
+</div>
+</div>
+
+{% endblock %}

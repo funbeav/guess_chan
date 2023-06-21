@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from game.models import Chan, CharacterName, ChanImage, Character, CharacterImage
+from game.models import Chan, CharacterName, ChanImage, Character, CharacterImage, UserChanImageAttempt
 
 
 class ImagePreviewInline(admin.StackedInline):
@@ -42,7 +42,7 @@ class ChanAdmin(admin.ModelAdmin):
 
 @admin.register(ChanImage)
 class ChanImageAdmin(ImageAdmin):
-    list_display = ('hash', 'caption', 'chan', 'image_preview', 'author',)
+    list_display = ('pk', 'hash', 'chan', 'image_preview', 'author',)
     fields = ('image', 'chan', 'caption', 'author',)
 
 
@@ -58,7 +58,7 @@ class CharacterImageInline(ImagePreviewInline):
 
 @admin.register(CharacterImage)
 class CharacterImageAdmin(ImageAdmin):
-    list_display = ('hash', 'caption', 'character', 'image_preview', 'author',)
+    list_display = ('pk', 'hash', 'character', 'image_preview', 'author',)
     fields = ('image', 'character', 'caption', 'author',)
 
 
@@ -75,3 +75,8 @@ class CharacterAdmin(admin.ModelAdmin):
 @admin.register(CharacterName)
 class CharacterNameAdmin(admin.ModelAdmin):
     list_display = ('character', 'name', 'lang',)
+
+
+@admin.register(UserChanImageAttempt)
+class UserChanImageAttemptAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'user', 'chan', 'chan_image', 'created', 'mode', 'is_pending', 'is_solved', 'is_shown',)

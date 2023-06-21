@@ -1,0 +1,67 @@
+{% extends "project/base.html" %}
+{% load static %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+
+<div class="mt-2 col-lg-3 col-lg-offset-4" style="margin: 0 auto; text-align: center">
+    <form method="post" enctype="multipart/form-data" action="{% url 'project:profile' %}" >
+        {% csrf_token %}
+        <div class="form-group mt-4">
+        {% if user.image %}
+            <img src="{{user.image.url}}" id="frame" style="max-width: 100%;" class="img-thumbnail" onerror="this.onerror=null; this.src='{% static 'project/avatar.jpg' %}'">
+        {% else %}
+            <img src="{% static 'project/avatar.jpg' %}" id="frame" class="img-thumbnail">
+        {% endif %}
+        </div>
+        <div class="input-group input-group-sm mt-1 mb-2">
+            {{form.image}}
+            <button type="button" class="btn btn-outline-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown"></button>
+              <div class="dropdown-menu dropdown-menu-end p-0" style="min-width: 5rem">
+                <a class="dropdown-item list-group-item-action list-group-item-danger" href="{% url 'project:delete_image' %}">Delete</a>
+              </div>
+        </div>
+        {% if form.errors.image %}
+            {% for err in form.errors.image %}
+                <p class="alert alert-warning py-2" role="alert" style="font-size: 16px">{{err}}</p>
+            {% endfor%}
+        {% endif %}
+        <div class="input-group mt-3 mb-2">
+            <span class="input-group-text">Login</span>
+            {{ form.login }}
+        </div>
+        {% if form.errors.login %}
+            {% for err in form.errors.login %}
+                <p class="alert alert-warning py-2" role="alert" style="font-size: 16px">{{err}}</p>
+            {% endfor%}
+        {% endif %}
+        <div class="input-group mt-3 mb-2">
+            <span class="input-group-text">Email</span>
+            {{ form.email }}
+        </div>
+        {% if form.errors.email %}
+            {% for err in form.errors.email %}
+                <p class="alert alert-warning py-2" role="alert" style="font-size: 16px">{{err}}</p>
+            {% endfor%}
+        {% endif %}
+        <div class="input-group mt-3 mb-2 input-group-sm">
+            <span class="input-group-text">Password</span>
+            <input type="password" class="form-control" readonly value="000000000000000000000">
+            <a href="{% url 'project:password_change' %}" class="btn btn-outline-secondary">Change</a>
+        </div>
+        <input type="submit" style="width: 110px;" class="btn btn-warning mt-2 mb-2 rounded-pill" value="Save">
+    </form>
+</div>
+
+<script>
+    function preview() {
+        frame.src = URL.createObjectURL(event.target.files[0]);
+    }
+    function clearImage() {
+        document.getElementById('upload').value = null;
+        frame.src = "";
+    }
+</script>
+
+{% endblock %}

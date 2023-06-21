@@ -1,0 +1,44 @@
+{% extends "project/verify/email_index.html" %}
+
+{%block content%}
+
+
+<div class="container" style="
+    height: auto;
+    margin-bottom: 100px;
+    margin-top: 100px;
+    border: 0px solid red;
+    background-color: rgb(255, 255, 255);
+    border-radius: 20px;
+    box-shadow: rgba(17, 12, 46, 0.15) 0px 48px 100px 0px;
+
+    ">
+
+
+    <div class="row" style="height: auto; border: 0px solid green;">
+        <div class="col" style="width: auto; border: 0px solid red;">
+            <div class="container" style="border: 0px solid; margin-top: 50px; padding-bottom: 10px;">
+                <h1 style="font-family: 'Mulish', sans-serif; text-align: center; color: black; font-size: calc(25px + 4vw);">
+                    {{status}}
+                </h1>
+            </div>
+            <hr style="background-color: white; width: 150px;">
+
+            <div class="container" style="border: 0px solid;">
+                <h1 style="font-family: 'Mulish', sans-serif; text-align: center; color: black; font-size: calc(15px + .8vw);">
+                {{msg}}
+                </h1>
+            </div>
+
+        </div>
+    </div>
+    <div class="row justify-content-center" style="padding: 50px">
+        <a href="{{link}}" class="btn btn-warning btn-lg" style="align-items: center; border-radius: 20px; margin-left: 10px; margin-right: 10px;">
+            Log In 
+        </a>
+    </div>
+
+</div>
+
+{%endblock%}
+
