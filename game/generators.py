@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from game.constants import NORMAL_MODE, DEFAULT_LANG
 from game.models import Chan, ChanImage, UserChanImageAttempt, CharacterName
+from game.objects import WordsLettersResult
 from project.models import User, Lang
 
 
@@ -127,18 +128,50 @@ class ChanImageGenerator:
 
 
 class ShuffledWordsLettersGenerator:
-    """Class for generating letters shuffled with random symbols"""
-    _min_len = 6
-    _max_len = 12
+    """Class for generating letters shuffled with random letters"""
+
+    _LANG_LETTERS = {
+        'en': {'vowels': 'AEIOU', 'consonants': 'BCDFGHJKLMNPQRSTVWXYZ'},
+        'ru': {'vowels': 'АЕИОУЫЭЮЯ', 'consonants': 'БВГДЖЗЙКЛМНПРСТФХЦЧШЩ'},
+        'de': {'vowels': 'AEIOUÄÖÜ', 'consonants': 'BCDFGHJKLMNPQRSTVWXYZß'},
+    }
 
     def __init__(self, lang: str):
-        self.lang = lang
+        self.lang = lang or 'en'    # by default lang = en
 
     def get_result_letters(self, source_string: str):
         words_lengths = [len(word) for word in source_string.strip().split(' ')]
         result_letters = [ch for ch in list(source_string.upper()) if ch.strip()]
+        result_letters = self._add_random_letters_with_same_lang(result_letters)
         random.shuffle(result_letters)
-        return {
-            'words_lengths': words_lengths,
-            'letters': result_letters,
-        }
+        return WordsLettersResult(
+            words_lengths=words_lengths,
+            letters=result_letters,
+        )
+
+    def _add_random_letters_with_same_lang(self, letters: list[str]):
+        """Method to add random letters with same lang.
+        Should add n = len(letters) random letters with n/2 vowels and n/2 consonants"""
+
+        vowels = self._LANG_LETTERS.get(self.lang).get('vowels')
+        consonants = self._LANG_LETTERS.get(self.lang).get('consonants')
+
+        num_letters = len(letters)
+        num_vowels = num_letters // 2
+        num_consonants = num_letters // 2
+
+        result_letters = []
+
+        # Add random vowels
+        for _ in range(num_vowels):
+            random_vowel = random.choice(vowels)
+            result_letters.append(random_vowel)
+
+        # Add random consonants
+        for _ in range(num_consonants):
+            random_consonant = random.choice(consonants)
+            result_letters.append(random_consonant)
+
+        result_letters.extend(letters)
+
+        return result_letters

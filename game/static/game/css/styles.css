@@ -1,0 +1,50 @@
+.empty-cell {
+  color: grey;
+  border: 2px solid #ccc;
+  border-radius: 3px;
+  width: 40px;
+  min-height: 40px; /* Add this line */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 5px;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.letter-cell {
+  border: 2px solid #ccc;
+  background-color: #ccc;
+  color: white;
+  width: 35px; /* Set the desired width */
+  height: 35px; /* Set the desired height */
+  padding: 5px;
+  margin: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease; /* Add transition effect */
+}
+
+#letters {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.letter {
+  cursor: pointer;
+  min-width: 35px;
+  min-height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-basis: 5%;
+}
+
+.letters-list {
+  display: flex;
+  justify-content: center;
+  transition: margin-top 0.3s ease; /* Add transition effect */
+}

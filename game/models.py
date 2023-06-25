@@ -81,6 +81,8 @@ class UserChanImageAttempt(models.Model):
     is_pending = models.BooleanField(default=True)
     is_shown = models.BooleanField(default=False)
 
+    # TO DO: shown_letters list to not generate new set every time by refresh - easy to abuse
+
     def save(self, commit: bool = True, *args, **kwargs):
         if commit:
             super().save(*args, **kwargs)

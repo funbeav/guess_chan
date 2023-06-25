@@ -18,3 +18,9 @@ class ChanImageResult:
     letters: Optional[list] = None
     words_letters_len: int = None
     message: str = ''
+
+
+@dataclass
+class WordsLettersResult:
+    words_lengths: Optional[list] = None
+    letters: Optional[list] = None

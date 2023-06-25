@@ -85,8 +85,8 @@ class GameProcessor:
                 chan_name = chan_image_generator.get_chan_name_by_chan_image()
 
                 words_letters = ShuffledWordsLettersGenerator('en').get_result_letters(chan_name)
-                result.words_lengths = words_letters.get('words_lengths', 0)
-                result.letters = words_letters.get('letters', [])
+                result.words_lengths = words_letters.words_lengths
+                result.letters = words_letters.letters
             else:
                 raise Exception(f"Available Chan not found")
         else:
