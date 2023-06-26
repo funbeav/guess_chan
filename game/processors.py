@@ -77,8 +77,7 @@ class GameProcessor:
         """Get next one chan_image for user if available"""
 
         if getattr(self.user, 'energy', 1) > 0:
-            chan_image_generator = ChanImageGenerator(self.user)
-            if chan_image_result := chan_image_generator.get_next_chan_image_result():
+            if chan_image_result := ChanImageGenerator(self.user).get_next_chan_image_result():
                 return chan_image_result
             else:
                 raise Exception(f"Available Chan not found")

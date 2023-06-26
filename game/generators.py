@@ -18,13 +18,13 @@ class ChanImageGenerator:
 
     def __init__(self, user: User, mode=NORMAL_MODE):
         self.user = user
-        self.lang = getattr(self.user, 'lang', None) or DEFAULT_LANG
         self.mode = mode
-        self.chan_image = None
-        self.chan_name = None
         self.chan_attempt = None
-        self.letters = []
-        self.words_lengths = []
+
+    @property
+    def lang(self):
+        """Return alpha2 lang for user or default"""
+        return 'ru' or getattr(self.user, 'lang', None) or DEFAULT_LANG
 
     def _get_chan_name_by_chan_image(self, chan_image: ChanImage = None) -> str:
         """Get Chan name by Chan Image with alpha2 lang"""
@@ -43,6 +43,7 @@ class ChanImageGenerator:
         return chan_name.name if chan_name else ''
 
     def get_next_chan_image_result(self) -> Optional[ChanImageResult]:
+        """Get next ChanImageResult"""
         chan_image = self._get_chan_image()
 
         if not chan_image:
@@ -66,7 +67,6 @@ class ChanImageGenerator:
 
     def _get_chan_image(self) -> Optional[ChanImage]:
         """Get chan image from UserChanImageAttempt"""
-        # TO DO: cache already gotten self.chan_images
         result_chan_image = None
 
         # Get pending chan image
