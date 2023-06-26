@@ -6,9 +6,10 @@ from typing import Optional
 from django.db.models import Subquery, Q
 from django.utils import timezone
 
+from common.utils import deep_getattr
 from game.constants import NORMAL_MODE, DEFAULT_LANG
 from game.models import Chan, ChanImage, UserChanImageAttempt, CharacterName
-from game.objects import WordsLettersResult
+from game.objects import WordsLettersResult, ChanImageResult
 from project.models import User, Lang
 
 
@@ -17,30 +18,51 @@ class ChanImageGenerator:
 
     def __init__(self, user: User, mode=NORMAL_MODE):
         self.user = user
+        self.lang = getattr(self.user, 'lang', None) or DEFAULT_LANG
         self.mode = mode
         self.chan_image = None
+        self.chan_name = None
+        self.chan_attempt = None
+        self.letters = []
+        self.words_lengths = []
 
-    def get_chan_name_by_chan_image(self, alpha2: str = None) -> str:
+    def _get_chan_name_by_chan_image(self, chan_image: ChanImage = None) -> str:
         """Get Chan name by Chan Image with alpha2 lang"""
-        if not self.chan_image:
+        if not chan_image:
             return ''
 
-        alpha2 = alpha2 or getattr(self.user, 'lang', None) or DEFAULT_LANG
-        lang = Lang.objects.filter(alpha2=alpha2).first()
+        lang = Lang.objects.filter(alpha2=self.lang).first()
         if not lang:
             return ''
 
-        character_name = CharacterName.objects.filter(
-            character__chan=self.chan_image.chan,
+        chan_name = CharacterName.objects.filter(
+            character__chan=chan_image.chan,
             lang=lang,
         ).first()
 
-        return character_name.name if character_name else ''
+        return chan_name.name if chan_name else ''
 
-    def get_next_chan_image(self) -> Optional[ChanImage]:
-        if not self.chan_image:
-            self.chan_image = self._get_chan_image()
-        return self.chan_image
+    def get_next_chan_image_result(self) -> Optional[ChanImageResult]:
+        chan_image = self._get_chan_image()
+
+        if not chan_image:
+            return None
+
+        if self.chan_attempt:
+            letters = self.chan_attempt.shown_letters
+            words_lengths = self.chan_attempt.words_lengths
+        else:
+            chan_name = self._get_chan_name_by_chan_image(chan_image)
+            words_letters_result = ShuffledWordsLettersGenerator(self.lang).get_result_letters(chan_name)
+            letters = words_letters_result.letters
+            words_lengths = words_letters_result.words_lengths
+
+        return ChanImageResult(
+            chan_image_id=chan_image.id,
+            chan_image_url=deep_getattr(chan_image, 'image', 'url'),
+            letters=letters,
+            words_lengths=words_lengths,
+        ) if chan_image else ChanImageResult()
 
     def _get_chan_image(self) -> Optional[ChanImage]:
         """Get chan image from UserChanImageAttempt"""
@@ -54,7 +76,8 @@ class ChanImageGenerator:
             is_pending=True,
             is_shown=False,
         ).last():
-            result_chan_image = pending_chan_attempt.chan_image
+            self.chan_attempt = pending_chan_attempt
+            result_chan_image = self.chan_attempt.chan_image
 
         # Get chan image from previous attempt (with 10% chance)
         if not result_chan_image and self._is_lucky_to_show_previous_attempt():
@@ -72,12 +95,17 @@ class ChanImageGenerator:
             ).order_by('?').first()
             if new_chan:
                 result_chan_image = ChanImage.objects.filter(chan=new_chan).order_by('?').first()
-                UserChanImageAttempt.objects.create(
+                chan_name = self._get_chan_name_by_chan_image(result_chan_image)
+                words_letters_result = ShuffledWordsLettersGenerator(self.lang).get_result_letters(chan_name)
+                new_chan_attempt = UserChanImageAttempt.objects.create(
                     user=self.user,
                     mode=self.mode,
                     chan=new_chan,
                     chan_image=result_chan_image,
+                    shown_letters=words_letters_result.letters,
+                    words_lengths=words_letters_result.words_lengths,
                 )
+                self.chan_attempt = new_chan_attempt
 
         # Get chan image from previous attempts if out of chans
         if not result_chan_image:
@@ -119,8 +147,16 @@ class ChanImageGenerator:
                 chan=unsolved_attempt.chan,
             ).order_by('?').first()
 
+            chan_name = self._get_chan_name_by_chan_image(chan_image)
+            words_letters_result = ShuffledWordsLettersGenerator(self.lang).get_result_letters(chan_name)
+            unsolved_attempt.shown_letters = words_letters_result.letters
+            unsolved_attempt.words_lengths = words_letters_result.words_lengths
+
+            unsolved_attempt.given_answer = ''
             unsolved_attempt.chan_image = chan_image
             unsolved_attempt.save()
+
+            self.chan_attempt = unsolved_attempt
 
             return chan_image
 
@@ -139,7 +175,7 @@ class ShuffledWordsLettersGenerator:
     def __init__(self, lang: str):
         self.lang = lang or 'en'    # by default lang = en
 
-    def get_result_letters(self, source_string: str):
+    def get_result_letters(self, source_string: str) -> WordsLettersResult:
         words_lengths = [len(word) for word in source_string.strip().split(' ')]
         result_letters = [ch for ch in list(source_string.upper()) if ch.strip()]
         result_letters = self._add_random_letters_with_same_lang(result_letters)

@@ -2,6 +2,7 @@ import datetime
 
 import imagehash
 from PIL import Image
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 
@@ -81,7 +82,9 @@ class UserChanImageAttempt(models.Model):
     is_pending = models.BooleanField(default=True)
     is_shown = models.BooleanField(default=False)
 
-    # TO DO: shown_letters list to not generate new set every time by refresh - easy to abuse
+    shown_letters = ArrayField(models.CharField(max_length=1), default=list)
+    words_lengths = ArrayField(models.IntegerField(), default=list)
+    given_answer = models.CharField(max_length=32, default='')
 
     def save(self, commit: bool = True, *args, **kwargs):
         if commit:
