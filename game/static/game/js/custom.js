@@ -14,6 +14,29 @@ function checkEmptyCells() {
   }
 }
 
+function returnLetterFromEmptyCell(emptyCell) {
+  const letterElement = emptyCell.querySelector('.letter');
+  if (letterElement) {
+    const letterId = letterElement.id;
+    const lettersList = document.getElementById('letters');
+    const letterToRestore = document.querySelector(`[id="${letterId}"]`);
+
+    if (letterToRestore) {
+      const newLetterElement = document.createElement("div");
+      newLetterElement.classList.add("letter", "letter-cell");
+      newLetterElement.innerText = letterElement.innerText;
+      newLetterElement.draggable = true;
+      newLetterElement.id = letterToRestore.id;
+      newLetterElement.addEventListener('dragstart', handleDragStart);
+      newLetterElement.addEventListener('dragend', handleDragEnd);
+      lettersList.appendChild(newLetterElement);
+    }
+
+    emptyCell.removeChild(letterElement);
+  }
+  checkEmptyCells();
+}
+
 
 function allowDrop(event) {
   event.preventDefault();
@@ -46,14 +69,7 @@ function handleDrop(event) {
   const lettersList = document.getElementById('letters');
 
   if (existingLetter) {
-    const returnedLetter = document.createElement("div");
-    returnedLetter.classList.add("letter", "letter-cell");
-    returnedLetter.innerText = existingLetter.innerText;
-    returnedLetter.draggable = true;
-    returnedLetter.id = existingLetter.id;
-    returnedLetter.addEventListener('dragstart', handleDragStart);
-    returnedLetter.addEventListener('dragend', handleDragEnd);
-    lettersList.appendChild(returnedLetter);
+    returnLetterFromEmptyCell(emptyCell);
   }
 
   letterElement.remove();
@@ -68,29 +84,6 @@ function handleDrop(event) {
 
   emptyCell.innerHTML = '';
   emptyCell.appendChild(newLetterElement);
-  checkEmptyCells();
-}
-
-function returnLetter(emptyCell) {
-  const letterElement = emptyCell.querySelector('.letter');
-  if (letterElement) {
-    const letterId = letterElement.id;
-    const lettersList = document.getElementById('letters');
-    const letterToRestore = document.querySelector(`[id="${letterId}"]`);
-
-    if (letterToRestore) {
-      const newLetterElement = document.createElement("div");
-      newLetterElement.classList.add("letter", "letter-cell");
-      newLetterElement.innerText = letterElement.innerText;
-      newLetterElement.draggable = true;
-      newLetterElement.id = letterToRestore.id;
-      newLetterElement.addEventListener('dragstart', handleDragStart);
-      newLetterElement.addEventListener('dragend', handleDragEnd);
-      lettersList.appendChild(newLetterElement);
-    }
-
-    emptyCell.removeChild(letterElement);
-  }
   checkEmptyCells();
 }
 
@@ -115,8 +108,48 @@ function fillEmptyCell(letter) {
   checkEmptyCells();
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('keydown', function(event) {
+  // Check if any key is pressed
+  if (event.key === 'Backspace') {
+    const filledCells = document.querySelectorAll('.empty-cell:not(:empty)');
+    const lastFilledCell = filledCells[filledCells.length - 1];
 
+    // Remove the letter from the rightmost filled cell and return it to the list
+    if (lastFilledCell) {
+      const letterElement = lastFilledCell.querySelector('.letter');
+      returnLetterFromEmptyCell(lastFilledCell);
+      checkEmptyCells();
+    }
+  } else if (event.key === 'Enter') {
+    const guessButton = document.getElementById('guessButton');
+    const nextButton = document.getElementById('nextButton');
+
+    // Trigger click event on the button
+    if (guessButton) {
+      guessButton.click();
+    } else if (nextButton) {
+      nextButton.click()
+    }
+  } else {
+    // Check if the pressed key exists in the letters list
+    const keyPressed = event.key.toLowerCase();
+    const letterElements = document.querySelectorAll('.letter-cell');
+    let selectedLetter = null;
+    letterElements.forEach(function(letter) {
+    if (letter.innerText.toLowerCase() === keyPressed) {
+      selectedLetter = letter;
+    }
+    });
+
+    // If a letter is found, fill the first empty cell with the letter
+    if (selectedLetter) {
+    fillEmptyCell(selectedLetter);
+    }
+  }
+  event.preventDefault();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
   // Add event listeners to letter elements
   const letters = document.querySelectorAll('.letter-cell');
   letters.forEach(letter => {
@@ -134,7 +167,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Process the guessed answer
         const emptyCells = document.querySelectorAll('.empty-cell');
         const wordsLengths = words_lengths;
-          console.log(words_lengths)
         let guessedAnswer = '';
         let letterIndex = 0;
         let wordIndex = 0;
