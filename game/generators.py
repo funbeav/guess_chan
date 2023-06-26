@@ -22,9 +22,9 @@ class ChanImageGenerator:
         self.chan_attempt = None
 
     @property
-    def lang(self):
+    def lang(self) -> str:
         """Return alpha2 lang for user or default"""
-        return 'ru' or getattr(self.user, 'lang', None) or DEFAULT_LANG
+        return getattr(self.user, 'lang', None) or DEFAULT_LANG
 
     def _get_chan_name_by_chan_image(self, chan_image: ChanImage = None) -> str:
         """Get Chan name by Chan Image with alpha2 lang"""
