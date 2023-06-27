@@ -71,6 +71,13 @@ class ChanImage(BaseImage):
 
 
 class UserChanImageAttempt(models.Model):
+    """
+    Model for storing all data about attempt of guessing chan_image by user
+    guess_hints = {
+        'en': {'shown_letters': ['a', 'b', 'c'], 'words_length': [1, 2]},
+        'ru': {'shown_letters': ['а', 'б', 'в'], 'words_length': [3, 4]}
+    }
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     chan = models.ForeignKey(Chan, on_delete=models.CASCADE)
     chan_image = models.ForeignKey(ChanImage, on_delete=models.CASCADE)
@@ -82,10 +89,15 @@ class UserChanImageAttempt(models.Model):
     is_pending = models.BooleanField(default=True)
     is_shown = models.BooleanField(default=False)
 
-    shown_letters = ArrayField(models.CharField(max_length=1), default=list)
-    words_lengths = ArrayField(models.IntegerField(), default=list)
     given_answer = models.CharField(max_length=32, default='')
+    guess_hints = models.JSONField()
 
     def save(self, commit: bool = True, *args, **kwargs):
         if commit:
             super().save(*args, **kwargs)
+
+    def get_shown_letters(self, alpha2: str) -> []:
+        return self.guess_hints.get(alpha2, {}).get('shown_letters', [])
+
+    def get_words_lengths(self, alpha2: str) -> []:
+        return self.guess_hints.get(alpha2, {}).get('words_lengths', [])

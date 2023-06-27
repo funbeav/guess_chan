@@ -1,6 +1,7 @@
 import random
 
 from datetime import timedelta
+from functools import cached_property
 from typing import Optional
 
 from django.db.models import Subquery, Q
@@ -19,28 +20,43 @@ class ChanImageGenerator:
     def __init__(self, user: User, mode=NORMAL_MODE):
         self.user = user
         self.mode = mode
-        self.chan_attempt = None
+        self.chan_attempt: Optional[UserChanImageAttempt] = None
 
-    @property
-    def lang(self) -> str:
-        """Return alpha2 lang for user or default"""
-        return getattr(self.user, 'lang', None) or DEFAULT_LANG
+    @cached_property
+    def lang(self) -> Lang:
+        """Return lang for user or default"""
+        return getattr(self.user, 'lang', None) or Lang.objects.get(alpha2=DEFAULT_LANG)
+
+    def _get_words_letters_result(self, string: str) -> WordsLettersResult:
+        return ShuffledWordsLettersGenerator(
+            self.lang.alpha2,
+        ).get_result_letters(string)
 
     def _get_chan_name_by_chan_image(self, chan_image: ChanImage = None) -> str:
         """Get Chan name by Chan Image with alpha2 lang"""
-        if not chan_image:
-            return ''
-
-        lang = Lang.objects.filter(alpha2=self.lang).first()
-        if not lang:
+        if not (chan_image and self.lang):
             return ''
 
         chan_name = CharacterName.objects.filter(
             character__chan=chan_image.chan,
-            lang=lang,
+            lang=self.lang,
         ).first()
 
         return chan_name.name if chan_name else ''
+
+    def _check_and_update_chan_guess_hints_for_lang(self, chan_image: ChanImage):
+        """If lang has changed - update it for new language in JSON fields"""
+        if not (self.lang and self.chan_attempt):
+            return
+
+        if self.lang.alpha2 not in self.chan_attempt.guess_hints:
+            chan_name = self._get_chan_name_by_chan_image(chan_image)
+            words_letters_result = self._get_words_letters_result(chan_name)
+            self.chan_attempt.guess_hints[self.lang.alpha2] = {
+                'shown_letters': words_letters_result.letters,
+                'words_lengths': words_letters_result.words_lengths,
+            }
+            self.chan_attempt.save()
 
     def get_next_chan_image_result(self) -> Optional[ChanImageResult]:
         """Get next ChanImageResult"""
@@ -50,11 +66,12 @@ class ChanImageGenerator:
             return None
 
         if self.chan_attempt:
-            letters = self.chan_attempt.shown_letters
-            words_lengths = self.chan_attempt.words_lengths
+            self._check_and_update_chan_guess_hints_for_lang(chan_image)
+            letters = self.chan_attempt.get_shown_letters(self.lang.alpha2)
+            words_lengths = self.chan_attempt.get_words_lengths(self.lang.alpha2)
         else:
             chan_name = self._get_chan_name_by_chan_image(chan_image)
-            words_letters_result = ShuffledWordsLettersGenerator(self.lang).get_result_letters(chan_name)
+            words_letters_result = self._get_words_letters_result(chan_name)
             letters = words_letters_result.letters
             words_lengths = words_letters_result.words_lengths
 
@@ -96,14 +113,19 @@ class ChanImageGenerator:
             if new_chan:
                 result_chan_image = ChanImage.objects.filter(chan=new_chan).order_by('?').first()
                 chan_name = self._get_chan_name_by_chan_image(result_chan_image)
-                words_letters_result = ShuffledWordsLettersGenerator(self.lang).get_result_letters(chan_name)
+                words_letters_result = self._get_words_letters_result(chan_name)
                 new_chan_attempt = UserChanImageAttempt.objects.create(
                     user=self.user,
                     mode=self.mode,
                     chan=new_chan,
                     chan_image=result_chan_image,
-                    shown_letters=words_letters_result.letters,
-                    words_lengths=words_letters_result.words_lengths,
+                    guess_hints={
+                        self.lang.alpha2: {
+                            'shown_letters': words_letters_result.letters,
+                            'words_lengths': words_letters_result.words_lengths,
+                        },
+                    },
+
                 )
                 self.chan_attempt = new_chan_attempt
 
@@ -148,9 +170,14 @@ class ChanImageGenerator:
             ).order_by('?').first()
 
             chan_name = self._get_chan_name_by_chan_image(chan_image)
-            words_letters_result = ShuffledWordsLettersGenerator(self.lang).get_result_letters(chan_name)
-            unsolved_attempt.shown_letters = words_letters_result.letters
-            unsolved_attempt.words_lengths = words_letters_result.words_lengths
+            words_letters_result = self._get_words_letters_result(chan_name)
+
+            unsolved_attempt.guess_hints = {
+                self.lang.alpha2: {
+                    'shown_letters': words_letters_result.letters,
+                    'words_lengths': words_letters_result.words_lengths,
+                },
+            }
 
             unsolved_attempt.given_answer = ''
             unsolved_attempt.chan_image = chan_image
@@ -172,8 +199,8 @@ class ShuffledWordsLettersGenerator:
         'de': {'vowels': 'AEIOUÄÖÜ', 'consonants': 'BCDFGHJKLMNPQRSTVWXYZß'},
     }
 
-    def __init__(self, lang: str):
-        self.lang = lang or 'en'    # by default lang = en
+    def __init__(self, lang_alpha2: str):
+        self.lang_alpha2 = lang_alpha2 or DEFAULT_LANG
 
     def get_result_letters(self, source_string: str) -> WordsLettersResult:
         words_lengths = [len(word) for word in source_string.strip().split(' ')]
@@ -185,12 +212,12 @@ class ShuffledWordsLettersGenerator:
             letters=result_letters,
         )
 
-    def _add_random_letters_with_same_lang(self, letters: list[str]):
+    def _add_random_letters_with_same_lang(self, letters: list[str]) -> list[str]:
         """Method to add random letters with same lang.
         Should add n = len(letters) random letters with n/2 vowels and n/2 consonants"""
 
-        vowels = self._LANG_LETTERS.get(self.lang).get('vowels')
-        consonants = self._LANG_LETTERS.get(self.lang).get('consonants')
+        vowels = self._LANG_LETTERS.get(self.lang_alpha2).get('vowels')
+        consonants = self._LANG_LETTERS.get(self.lang_alpha2).get('consonants')
 
         num_letters = len(letters)
         num_vowels = num_letters // 2

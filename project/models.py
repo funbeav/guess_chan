@@ -13,6 +13,14 @@ class BaseModel(models.Model):
     date_updated = models.DateTimeField(auto_now=True)
 
 
+class Lang(models.Model):
+    alpha2 = models.CharField(max_length=5, unique=True)
+    name = models.CharField(max_length=30)
+
+    def __str__(self):
+        return f'{self.name} ({self.alpha2})'
+
+
 class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     """ User model: identification by email, additional fields: first_name, last_name, father_name. """
     email = models.EmailField(unique=True, verbose_name=_('Email'))
@@ -27,7 +35,7 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
         size=[LOGO_RESOLUTION, LOGO_RESOLUTION],
     )
     energy = models.IntegerField(default=10)
-    lang = models.CharField(max_length=2, verbose_name=_('Language'), default='en')
+    lang = models.ForeignKey(Lang, on_delete=models.SET_NULL, null=True, blank=True)
 
     USERNAME_FIELD = 'login'
     REQUIRED_FIELDS = ['email']
@@ -44,11 +52,3 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
 
     def __str__(self):
         return f'{self.login}'
-
-
-class Lang(models.Model):
-    alpha2 = models.CharField(max_length=5, unique=True)
-    name = models.CharField(max_length=30)
-
-    def __str__(self):
-        return f'{self.name} ({self.alpha2})'

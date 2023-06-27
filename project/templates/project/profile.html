@@ -28,6 +28,15 @@
             {% endfor%}
         {% endif %}
         <div class="input-group mt-3 mb-2">
+            <span class="input-group-text">Language</span>
+            {{ form.lang }}
+        </div>
+        {% if form.errors.language %}
+            {% for err in form.errors.language %}
+                <p class="alert alert-warning py-2" role="alert" style="font-size: 16px">{{err}}</p>
+            {% endfor%}
+        {% endif %}
+        <div class="input-group mt-3 mb-2">
             <span class="input-group-text">Login</span>
             {{ form.login }}
         </div>

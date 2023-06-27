@@ -1,16 +1,21 @@
 from django.contrib.auth import password_validation
-from django.contrib.auth.forms import AuthenticationForm, UsernameField, UserCreationForm, UserChangeForm, \
-    PasswordResetForm, SetPasswordForm
-from django.contrib.auth.password_validation import NumericPasswordValidator
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordResetForm,
+    SetPasswordForm,
+    UserChangeForm,
+    UserCreationForm,
+    UsernameField,
+)
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.utils.translation import gettext_lazy as _
 
 from django import forms
-from django.forms import EmailField, ImageField, BooleanField
+from django.forms import EmailField, ImageField
 
 from guess_chan.settings import ALLOWED_EXTENSIONS
-from project.models import User
+from project.models import User, Lang
 
 
 def validate_password_strength(value):
@@ -87,10 +92,15 @@ class UserProfileForm(UserChangeForm):
         required=False,
         validators=[FileExtensionValidator(allowed_extensions=ALLOWED_EXTENSIONS)]
     )
+    lang = forms.ModelChoiceField(
+        queryset=Lang.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        empty_label=None,
+    )
 
     class Meta:
         model = User
-        fields = ("login", "email", "image",)
+        fields = ("login", "email", "image", "lang")
 
     def clean_image(self):
         if 'image' in self.changed_data:

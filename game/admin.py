@@ -89,5 +89,6 @@ class UserChanImageAttemptAdmin(admin.ModelAdmin):
         'is_pending',
         'is_solved',
         'is_shown',
+        'guess_hints',
         'given_answer',
     )
