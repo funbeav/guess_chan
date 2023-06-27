@@ -24,3 +24,12 @@ class ChanImageResult:
 class WordsLettersResult:
     words_lengths: Optional[list] = None
     letters: Optional[list] = None
+
+
+@dataclass
+class UserAttemptLog:
+    id: int = None
+    image_url: str = None
+    status: str = None
+    answer: str = None
+    date: str = None

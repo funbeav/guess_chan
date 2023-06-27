@@ -75,7 +75,7 @@ class UserChanImageAttempt(models.Model):
     Model for storing all data about attempt of guessing chan_image by user
     guess_hints = {
         'en': {'shown_letters': ['a', 'b', 'c'], 'words_length': [1, 2]},
-        'ru': {'shown_letters': ['а', 'б', 'в'], 'words_length': [3, 4]}
+        'ru': {'shown_letters': ['а', 'б', 'в'], 'words_length': [3, 4]},
     }
     """
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)

@@ -10,7 +10,7 @@ from django.utils import timezone
 from common.utils import deep_getattr
 from game.constants import NORMAL_MODE, DEFAULT_LANG
 from game.models import Chan, ChanImage, UserChanImageAttempt, CharacterName
-from game.objects import WordsLettersResult, ChanImageResult
+from game.objects import WordsLettersResult, ChanImageResult, UserAttemptLog
 from project.models import User, Lang
 
 
@@ -238,3 +238,44 @@ class ShuffledWordsLettersGenerator:
         result_letters.extend(letters)
 
         return result_letters
+
+
+class UserAttemptLogGenerator:
+    _CORRECT = 'Guessed'
+    _INCORRECT = 'Incorrect'
+    _SHOWN_CORRECT = 'Viewed answer'
+    _PENDING = 'Wait for guess'
+    _UNKNOWN = 'Unknown'
+
+    def __init__(self, user: User):
+        self.user = user
+
+    def get_user_attempt_logs(self) -> list[UserAttemptLog]:
+        user_attempt_logs = []
+        attempts = UserChanImageAttempt.objects.filter(
+            user=self.user,
+        ).select_related('chan_image').order_by('-id')
+        for attempt in attempts:
+            user_status = self._calculate_user_status(
+                attempt.is_pending,
+                attempt.is_solved,
+                attempt.is_shown,
+            )
+            user_attempt_logs.append(UserAttemptLog(
+                id=attempt.id,
+                image_url=attempt.chan_image.image.url,
+                status=user_status,
+                answer=attempt.given_answer,
+                date=attempt.created,
+            ))
+        return user_attempt_logs
+
+    def _calculate_user_status(self, is_pending: bool, is_solved: bool, is_shown: bool) -> str:
+        if is_solved:
+            return self._CORRECT
+        elif is_shown:
+            return self._SHOWN_CORRECT
+        elif is_pending:
+            return self._PENDING
+        else:
+            return self._INCORRECT

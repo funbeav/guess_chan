@@ -1,0 +1,32 @@
+{% extends 'project/base.html' %}
+{% load static %}
+
+{% block title %}Logs Chan{% endblock %}
+
+{% block content %}
+    <div class="d-flex flex-column align-items-center align-self-center mt-2">
+        <h2>Logs</h2>
+        <table class="table align-middle text-center">
+            <thead>
+                <tr>
+                    <th>Image</th>
+                    <th>Answer</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attempt in attempts %}
+                    <tr>
+                        <td><a href="{{ attempt.image_url }}" style="user-select: none;">
+                            <img src="{{ attempt.image_url }}" height="50" width="50"/>
+                        </a></td>
+                        <td>{{ attempt.answer }}</td>
+                        <td><i>{{ attempt.status }}</i></td>
+                        <td>{{ attempt.date|date:"Y-m-d H:i" }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

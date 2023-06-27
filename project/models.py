@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django_resized import ResizedImageField
 
 from common.utils import generate_filename
+from game.constants import DEFAULT_LANG
 from guess_chan.settings import LOGO_RESOLUTION
 from .managers import UserManager
 
@@ -49,6 +50,11 @@ class User(AbstractBaseUser, PermissionsMixin, BaseModel):
     def change_energy(self, energy: int):
         self.energy += energy
         self.save()
+
+    def save(self, *args, **kwargs):
+        if not self.lang:
+            self.lang = Lang.objects.get(alpha2=DEFAULT_LANG)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.login}'

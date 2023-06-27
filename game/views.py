@@ -1,6 +1,9 @@
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import render
 
+from game.generators import UserAttemptLogGenerator
+from game.models import UserChanImageAttempt
 from game.processors import GameProcessor
 from project.forms import UserLoginForm
 
@@ -54,9 +57,11 @@ def index(request):
     return render(request, 'game/index.html', attrs)
 
 
-def about(request):
+@login_required
+def logs(request):
+    attempts = UserAttemptLogGenerator(request.user).get_user_attempt_logs()
     attrs = {
-        'title': 'About us',
         'form': UserLoginForm(request),
+        'attempts': attempts,
     }
-    return render(request, 'game/about.html', attrs)
+    return render(request, 'game/logs.html', attrs)
