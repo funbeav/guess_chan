@@ -3,7 +3,6 @@ from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 
 from api.serializers import AnswerResultSerializer, ChanImageResultSerializer, UserSerializer
-from game.exceptions import BaseChanException
 from game.processors import GameProcessor
 from project.models import User
 

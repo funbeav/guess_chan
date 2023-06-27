@@ -1,18 +1,27 @@
 {% extends 'project/base.html' %}
+{% load static %}
+{% load custom_filters %}
 
-{% block title %}
-{{ title }}
-{% endblock %}
+{% block title %}Guess Chan{% endblock %}
 
 {% block content %}
     <div class="d-flex flex-column align-items-center align-self-center mt-2">
+        {% if image.words_lengths %}
+            <script>const words_lengths = {{ image.words_lengths|safe }};</script>
+        {% endif %}
+        <script src="{% static 'game/js/custom.js' %}"></script>
         {% if answer_result %}
             {% if answer_result.is_correct %}
                 <h2 class="text-primary">Correct!</h2>
                 <a href="{{ image.url }}"><img src="{{ image.url }}" height="400px"/></a>
                 <h2 class="text-primary text-center mt-2">{{ answer_result.correct_answer }}</h2>
                 <div class="align-items-center text-center">
-                    <a href="{% url 'game:home' %}" class="btn btn-primary mt-2 mb-3 rounded-pill" style="width: 110px;">
+                    <a
+                        id="nextButton"
+                        href="{% url 'game:home' %}"
+                        class="btn btn-primary mt-2 mb-3 rounded-pill"
+                        style="width: 110px;"
+                    >
                         Next
                     </a>
                 </div>
@@ -28,13 +37,18 @@
                             <input type="hidden" name="answer" class="form-control text-center" value="{{ answer_result.given_answer }}">
                             <input type="hidden" name="image_id" class="form-control" value="{{ image.id }}">
                             <input type="hidden" name="show_correct_answer" class="form-control" value=True>
-                            <input type="submit" class="btn btn-danger rounded-pill" style="width: 22 0px;" value="Show correct answer">
+                            <input type="submit" class="btn btn-danger rounded-pill" style="width: 220px;" value="Show correct answer">
                         </div>
                     </form>
                     <p> (will never be shown again)</p>
                 {% endif %}
                 <div class="align-items-center text-center">
-                    <a href="{% url 'game:home' %}" class="btn btn-primary mt-2 mb-3 rounded-pill" style="width: 110px;">
+                    <a
+                        id="nextButton"
+                        href="{% url 'game:home' %}"
+                        class="btn btn-primary mt-2 mb-3 rounded-pill"
+                        style="width: 110px;"
+                    >
                         Next
                     </a>
                 </div>
@@ -42,28 +56,34 @@
         {% else %}
             <h2>Guess Chan</h2>
             {% if image.url %}
-                <a href="{{ image.url }}"><img src="{{ image.url }}" height="400px"/></a>
-                <form method="post" action="{% url 'game:home' %}" >
+                <a href="{{ image.url }}" style="user-select: none;"><img src="{{ image.url }}" height="400px"/></a>
+                <form id="guess-form" method="post" action="{% url 'game:home' %}">
                     {% csrf_token %}
-                    <div class="form-group mt-3">
-                        <input type="text" name="answer" class="form-control text-center">
-                        <input type="hidden" name="image_id" class="form-control" value="{{ image.id }}">
+                    <input type="hidden" name="answer" class="form-control text-center" value="{{ answer_result.given_answer }}">
+                    <input type="hidden" name="image_id" class="form-control" value="{{ image.id }}">
+                    <div id="empty-cells" class="form-group mt-3 d-flex justify-content-center">
+                      {% for word_length in image.words_lengths %}
+                        {% for _ in word_length|range_int %}
+                          <div class="empty-cell mx-1" ondragover="allowDrop(event)" ondrop="handleDrop(event)" onclick="returnLetterFromEmptyCell(this)"></div>
+                        {% endfor %}
+                        {% if not forloop.last %}
+                          <div class="mx-3" style="user-select: none;"></div>
+                        {% endif %}
+                      {% endfor %}
                     </div>
-                    {% if image.words_lengths and image.letters %}
-                        <div class="form-group text-center mt-3">
-                            Words lengths:
-                            {% for words_length in image.words_lengths %}
-                                {{ words_length }}{% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                            <br>
-                            Letters:
-                            {% for letter in image.letters %}
-                                {{ letter }}{% if not forloop.last %}, {% endif %}
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                    <div class="form-group d-flex flex-column align-items-center mt-3 mb-3">
-                        <input type="submit" class="btn btn-danger rounded-pill" style="width: 110px;" value="Guess!">
+                    <div id="letters" class="form-group text-center mt-3 d-flex justify-content-center">
+                      {% for letter in image.letters %}
+                        <div class="letter letter-cell" draggable="true" id="{{ letter }}-{{ forloop.counter }}">{{ letter }}</div>
+                      {% endfor %}
+                    </div>
+                    <div class="form-group d-flex justify-content-center mt-3 mb-3">
+                        <button
+                            id="guessButton"
+                            type="submit"
+                            class="btn btn-danger rounded-pill"
+                            style="width: 220px;"
+                            disabled="true"
+                        >Guess!</button>
                     </div>
                 </form>
             {% else %}

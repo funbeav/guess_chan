@@ -16,5 +16,20 @@ class ChanImageResult:
     chan_image_id: Optional[int] = None
     chan_image_url: Optional[str] = None
     letters: Optional[list] = None
-    words_letters_len: int = None
+    words_lengths: Optional[list] = None
     message: str = ''
+
+
+@dataclass
+class WordsLettersResult:
+    words_lengths: Optional[list] = None
+    letters: Optional[list] = None
+
+
+@dataclass
+class UserAttemptLog:
+    id: int = None
+    image_url: str = None
+    status: str = None
+    answer: str = None
+    date: str = None
