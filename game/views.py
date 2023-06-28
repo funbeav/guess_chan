@@ -19,7 +19,7 @@ def index(request):
         given_answer = request.POST['answer']
         image_id_to_guess = request.POST['image_id']
         try:
-            answer_result = game.process_answer(given_answer, image_id_to_guess)
+            answer_result = game.process_answer(given_answer, int(image_id_to_guess))
         except Exception as exc:
             message = exc
         image = {
@@ -43,9 +43,9 @@ def index(request):
         image = {
             'id': chan_image_id,
             'url': chan_image_url,
-            'message': message,
             'words_lengths': words_lengths,
             'letters': letters,
+            'message': message,
         }
 
     attrs = {

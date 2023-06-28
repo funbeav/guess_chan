@@ -6,27 +6,45 @@
 {% block content %}
     <div class="d-flex flex-column align-items-center align-self-center mt-2">
         <h2>Logs</h2>
-        <table class="table align-middle text-center">
-            <thead>
-                <tr>
-                    <th>Image</th>
-                    <th>Answer</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for attempt in attempts %}
+        <div style="width: 60%; display: flex; justify-content: center;">
+            <table class="table align-middle text-center">
+                <thead>
                     <tr>
-                        <td><a href="{{ attempt.image_url }}" style="user-select: none;">
-                            <img src="{{ attempt.image_url }}" height="50" width="50"/>
-                        </a></td>
-                        <td>{{ attempt.answer }}</td>
-                        <td><i>{{ attempt.status }}</i></td>
-                        <td>{{ attempt.date|date:"Y-m-d H:i" }}</td>
+                        <th>Image</th>
+                        <th>Answer</th>
+                        <th>Status</th>
+                        <th>Date</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for attempt in attempts %}
+                        <tr>
+                            <td><a href="{{ attempt.image_url }}" style="user-select: none;">
+                                <div style="
+                                    width: 50px;
+                                    height: 50px;
+                                    overflow: hidden;"
+                                >
+                                    <img src="{{ attempt.image_url }}" style="
+                                        display: block;
+                                        max-width: none;
+                                        max-height: none;
+                                        width: auto;
+                                        height: 50px;
+                                        margin: 0 auto;
+                                        position: relative;
+                                        top: 50%;
+                                        transform: translateY(-50%);"
+                                    />
+                                </div>
+                            </a></td>
+                            <td>{{ attempt.answer }}</td>
+                            <td><i>{{ attempt.status }}</i></td>
+                            <td>{{ attempt.date|date:"Y-m-d H:i" }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 {% endblock %}

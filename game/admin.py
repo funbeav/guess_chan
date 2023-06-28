@@ -82,12 +82,11 @@ class UserChanImageAttemptAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
         'user',
-        'chan',
         'chan_image',
-        'created',
-        'mode',
         'is_pending',
         'is_solved',
         'is_shown',
         'given_answer',
+        'answer_lang',
+        'created',
     )

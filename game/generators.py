@@ -55,6 +55,7 @@ class ChanImageGenerator:
             self.chan_attempt.guess_hints[self.lang.alpha2] = {
                 'shown_letters': words_letters_result.letters,
                 'words_lengths': words_letters_result.words_lengths,
+                'correct_answer': chan_name,
             }
             self.chan_attempt.save()
 
@@ -106,7 +107,7 @@ class ChanImageGenerator:
             showed_chans_ids = UserChanImageAttempt.objects.filter(
                 user=self.user,
                 mode=self.mode,
-            ).values_list('chan__id', flat=True)
+            ).values_list('chan_image__chan__id', flat=True)
             new_chan = Chan.objects.filter(
                 ~Q(id__in=showed_chans_ids),
             ).order_by('?').first()
@@ -117,15 +118,14 @@ class ChanImageGenerator:
                 new_chan_attempt = UserChanImageAttempt.objects.create(
                     user=self.user,
                     mode=self.mode,
-                    chan=new_chan,
                     chan_image=result_chan_image,
                     guess_hints={
                         self.lang.alpha2: {
                             'shown_letters': words_letters_result.letters,
                             'words_lengths': words_letters_result.words_lengths,
+                            'correct_answer': chan_name,
                         },
                     },
-
                 )
                 self.chan_attempt = new_chan_attempt
 
@@ -150,12 +150,12 @@ class ChanImageGenerator:
             is_solved=False,
             created__lte=created_lte,
         ).exclude(
-            chan_id__in=Subquery(
+            chan_image__chan_id__in=Subquery(
                 UserChanImageAttempt.objects.filter(
                     user=self.user,
                     mode=self.mode,
                     is_shown=True,
-                ).values_list('chan_id', flat=True),
+                ).values_list('chan_image__chan_id', flat=True),
             ),
         ).order_by('?').first()
 
@@ -166,7 +166,7 @@ class ChanImageGenerator:
 
             # Get one of the suitable chan images if there are several
             chan_image = ChanImage.objects.filter(
-                chan=unsolved_attempt.chan,
+                chan=unsolved_attempt.chan_image.chan,
             ).order_by('?').first()
 
             chan_name = self._get_chan_name_by_chan_image(chan_image)
@@ -176,6 +176,7 @@ class ChanImageGenerator:
                 self.lang.alpha2: {
                     'shown_letters': words_letters_result.letters,
                     'words_lengths': words_letters_result.words_lengths,
+                    'correct_answer': chan_name,
                 },
             }
 
@@ -250,6 +251,11 @@ class UserAttemptLogGenerator:
     def __init__(self, user: User):
         self.user = user
 
+    @cached_property
+    def lang_alpha2(self) -> Lang:
+        """Return lang for user or default"""
+        return deep_getattr(self.user, 'lang', 'alpha2') or DEFAULT_LANG
+
     def get_user_attempt_logs(self) -> list[UserAttemptLog]:
         user_attempt_logs = []
         attempts = UserChanImageAttempt.objects.filter(
@@ -257,20 +263,29 @@ class UserAttemptLogGenerator:
         ).select_related('chan_image').order_by('-id')
         for attempt in attempts:
             user_status = self._calculate_user_status(
-                attempt.is_pending,
-                attempt.is_solved,
-                attempt.is_shown,
+                is_pending=attempt.is_pending,
+                is_solved=attempt.is_solved,
+                is_shown=attempt.is_shown,
             )
+            answer = attempt.given_answer
+            correct_answer = attempt.get_correct_answer(getattr(attempt.answer_lang, 'alpha2', ''))
+            if user_status in [self._SHOWN_CORRECT, self._CORRECT] and correct_answer:
+                answer = f'{answer} ({correct_answer})'
             user_attempt_logs.append(UserAttemptLog(
                 id=attempt.id,
                 image_url=attempt.chan_image.image.url,
                 status=user_status,
-                answer=attempt.given_answer,
+                answer=answer,
                 date=attempt.created,
             ))
         return user_attempt_logs
 
-    def _calculate_user_status(self, is_pending: bool, is_solved: bool, is_shown: bool) -> str:
+    def _calculate_user_status(
+        self,
+        is_pending: bool,
+        is_solved: bool,
+        is_shown: bool,
+    ) -> str:
         if is_solved:
             return self._CORRECT
         elif is_shown:
