@@ -2,9 +2,9 @@ from functools import cached_property
 
 from common.utils import deep_getattr
 from game.constants import DEFAULT_LANG
-from game.generators import ChanImageGenerator
-from game.models import ChanImage, CharacterImage, UserChanImageAttempt
-from game.objects import AnswerResult, ChanImageResult
+from game.generators import ChanAttemptGenerator
+from game.models import CharacterImage, UserChanImageAttempt
+from game.objects import AttemptAnswerResult, ChanAttemptResult
 from project.models import Lang
 
 
@@ -20,24 +20,20 @@ class GameProcessor:
         """Return lang for user or default"""
         return getattr(self.user, 'lang', None) or Lang.objects.get(alpha2=DEFAULT_LANG)
 
-    def process_answer(self, answer: str, chan_image_id: int) -> AnswerResult:
+    def process_answer(self, answer: str, attempt_id: int) -> AttemptAnswerResult:
         """Get result of answering on chan_image_id and modify last UserChanImageAttempt"""
 
-        answer_result = AnswerResult(given_answer=answer, chan_image_id=chan_image_id)
-        if not chan_image_id:
-            raise Exception(f"Chan Image ID is not provided")
-
-        correct_chan_image = ChanImage.objects.filter(id=chan_image_id).first()
-        if not correct_chan_image:
-            raise Exception(f"Chan Image [{chan_image_id}] not found")
+        answer_result = AttemptAnswerResult(given_answer=answer, attempt_id=attempt_id)
+        if not attempt_id:
+            raise Exception(f"Attempt ID is not provided")
 
         last_attempt = UserChanImageAttempt.objects.filter(user=self.user).last()
 
         if not last_attempt:
             raise Exception(f"No last attempt")
 
-        if last_attempt.chan_image_id != chan_image_id:
-            raise Exception(f"Chan Image [{chan_image_id}] does not fit the last attempt")
+        if last_attempt.id != attempt_id:
+            raise Exception(f"Attempt [{attempt_id}] does not fit the last attempt [{last_attempt.id}]")
 
         correct_answer = last_attempt.get_correct_answer(self.lang.alpha2)
 
@@ -57,12 +53,12 @@ class GameProcessor:
         elif self.show_correct_answer:
             self.show_answer(last_attempt)
         else:
-            raise Exception(f"There is no pending Chan Image [{chan_image_id}]")
+            raise Exception(f"There is no pending Attempt [{attempt_id}]")
 
         if answer_result.is_correct or self.show_correct_answer:
             answer_result.correct_answer = correct_answer
             answer_result.character_image_url = deep_getattr(
-                CharacterImage.objects.filter(character=correct_chan_image.chan.character).first(), 'image', 'url',
+                CharacterImage.objects.filter(character=last_attempt.chan_image.chan.character).first(), 'image', 'url',
             )
         return answer_result
 
@@ -73,10 +69,10 @@ class GameProcessor:
         else:
             raise Exception(f"Chan for this Chan Image [{chan_attempt.chan_image.id}] was already shown")
 
-    def get_chan_image_result(self) -> ChanImageResult:
+    def get_chan_attempt(self) -> ChanAttemptResult:
         """Get next one chan_image for user if available"""
         if getattr(self.user, 'energy', 1) > 0:
-            if chan_image_result := ChanImageGenerator(self.user).get_next_chan_image_result():
+            if chan_image_result := ChanAttemptGenerator(self.user).get_next_chan_attempt():
                 return chan_image_result
             else:
                 raise Exception(f"Available Chan not found")

@@ -12,6 +12,7 @@
                     <tr>
                         <th>Image</th>
                         <th>Answer</th>
+                        <th>Correct</th>
                         <th>Status</th>
                         <th>Date</th>
                     </tr>
@@ -39,6 +40,7 @@
                                 </div>
                             </a></td>
                             <td>{{ attempt.answer }}</td>
+                            <td>{{ attempt.correct }}</td>
                             <td><i>{{ attempt.status }}</i></td>
                             <td>{{ attempt.date|date:"Y-m-d H:i" }}</td>
                         </tr>

@@ -9,13 +9,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'login', 'email', 'date_created']
 
 
-class ChanImageResultSerializer(serializers.Serializer):
+class ChanAttemptResultSerializer(serializers.Serializer):
     chan_image_id = serializers.IntegerField()
     chan_image_url = serializers.CharField(max_length=200)
     message = serializers.CharField(max_length=200)
 
 
-class AnswerResultSerializer(serializers.Serializer):
+class AttemptAnswerResultSerializer(serializers.Serializer):
     chan_image_id = serializers.IntegerField(required=True, allow_null=False)
     given_answer = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=200)
     show_correct_answer = serializers.BooleanField(required=False, write_only=True)

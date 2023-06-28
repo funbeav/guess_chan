@@ -2,7 +2,7 @@ from rest_framework import viewsets, permissions
 from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 
-from api.serializers import AnswerResultSerializer, ChanImageResultSerializer, UserSerializer
+from api.serializers import AttemptAnswerResultSerializer, ChanAttemptResultSerializer, UserSerializer
 from game.processors import GameProcessor
 from project.models import User
 
@@ -31,16 +31,16 @@ class GameViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):
-        if self.action == 'get_chan_image_result':
-            return ChanImageResultSerializer
+        if self.action == 'get_chan_attempt':
+            return ChanAttemptResultSerializer
         if self.action == 'get_answer_result':
-            return AnswerResultSerializer
-        return ChanImageResultSerializer
+            return AttemptAnswerResultSerializer
+        return ChanAttemptResultSerializer
 
-    def get_chan_image_result(self, request):
+    def get_chan_attempt(self, request):
         try:
             game = GameProcessor(user=request.user)
-            chan_image_result = game.get_chan_image_result()
+            chan_image_result = game.get_chan_attempt()
             serializer = self.get_serializer(chan_image_result)
         except Exception as exc:
             raise APIException(exc)

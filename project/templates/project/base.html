@@ -16,8 +16,10 @@
         <div class="d-flex justify-content-around flex-wrap-reverse align-items-center">
 
             <div class="d-flex flex-row">
-              <a href="{% url 'game:home' %}" class="nav-link px-2 text-secondary">Play</a>
-              <a href="{% url 'game:logs' %}" class="nav-link px-2 text-secondary">Logs</a>
+                <a href="{% url 'game:home' %}" class="nav-link px-2 text-secondary">Play</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'game:logs' %}" class="nav-link px-2 text-secondary">Logs</a>
+                {% endif %}
             </div>
 
             {% if user.is_authenticated %}

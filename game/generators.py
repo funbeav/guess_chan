@@ -10,11 +10,11 @@ from django.utils import timezone
 from common.utils import deep_getattr
 from game.constants import NORMAL_MODE, DEFAULT_LANG
 from game.models import Chan, ChanImage, UserChanImageAttempt, CharacterName
-from game.objects import WordsLettersResult, ChanImageResult, UserAttemptLog
+from game.objects import WordsLettersResult, ChanAttemptResult, UserAttemptLog
 from project.models import User, Lang
 
 
-class ChanImageGenerator:
+class ChanAttemptGenerator:
     """Generates Chan Batches for current user"""
 
     def __init__(self, user: User, mode=NORMAL_MODE):
@@ -59,29 +59,31 @@ class ChanImageGenerator:
             }
             self.chan_attempt.save()
 
-    def get_next_chan_image_result(self) -> Optional[ChanImageResult]:
-        """Get next ChanImageResult"""
+    def get_next_chan_attempt(self) -> Optional[ChanAttemptResult]:
+        """Get next ChanAttemptResult"""
         chan_image = self._get_chan_image()
 
         if not chan_image:
             return None
 
         if self.chan_attempt:
+            chan_attempt_id = self.chan_attempt.id
             self._check_and_update_chan_guess_hints_for_lang(chan_image)
             letters = self.chan_attempt.get_shown_letters(self.lang.alpha2)
             words_lengths = self.chan_attempt.get_words_lengths(self.lang.alpha2)
         else:
+            chan_attempt_id = None
             chan_name = self._get_chan_name_by_chan_image(chan_image)
             words_letters_result = self._get_words_letters_result(chan_name)
             letters = words_letters_result.letters
             words_lengths = words_letters_result.words_lengths
 
-        return ChanImageResult(
-            chan_image_id=chan_image.id,
+        return ChanAttemptResult(
+            attempt_id=chan_attempt_id,
             chan_image_url=deep_getattr(chan_image, 'image', 'url'),
             letters=letters,
             words_lengths=words_lengths,
-        ) if chan_image else ChanImageResult()
+        ) if chan_image else ChanAttemptResult()
 
     def _get_chan_image(self) -> Optional[ChanImage]:
         """Get chan image from UserChanImageAttempt"""
@@ -247,6 +249,7 @@ class UserAttemptLogGenerator:
     _SHOWN_CORRECT = 'Viewed answer'
     _PENDING = 'Wait for guess'
     _UNKNOWN = 'Unknown'
+    _HIDDEN = '-'
 
     def __init__(self, user: User):
         self.user = user
@@ -267,15 +270,16 @@ class UserAttemptLogGenerator:
                 is_solved=attempt.is_solved,
                 is_shown=attempt.is_shown,
             )
-            answer = attempt.given_answer
+            correct = self._HIDDEN
             correct_answer = attempt.get_correct_answer(getattr(attempt.answer_lang, 'alpha2', ''))
             if user_status in [self._SHOWN_CORRECT, self._CORRECT] and correct_answer:
-                answer = f'{answer} ({correct_answer})'
+                correct = correct_answer
             user_attempt_logs.append(UserAttemptLog(
                 id=attempt.id,
                 image_url=attempt.chan_image.image.url,
                 status=user_status,
-                answer=answer,
+                answer=attempt.given_answer or self._HIDDEN,
+                correct=correct,
                 date=attempt.created,
             ))
         return user_attempt_logs

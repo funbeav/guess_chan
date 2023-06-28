@@ -3,8 +3,8 @@ from typing import Optional
 
 
 @dataclass
-class AnswerResult:
-    chan_image_id: int = None
+class AttemptAnswerResult:
+    attempt_id: int = None
     is_correct: bool = False
     given_answer: str = ''
     correct_answer: Optional[str] = None
@@ -12,8 +12,8 @@ class AnswerResult:
 
 
 @dataclass
-class ChanImageResult:
-    chan_image_id: Optional[int] = None
+class ChanAttemptResult:
+    attempt_id: Optional[int] = None
     chan_image_url: Optional[str] = None
     letters: Optional[list] = None
     words_lengths: Optional[list] = None
@@ -32,4 +32,5 @@ class UserAttemptLog:
     image_url: str = None
     status: str = None
     answer: str = None
+    correct: str = None
     date: str = None
