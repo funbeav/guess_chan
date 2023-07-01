@@ -6,14 +6,14 @@
 
 {% block content %}
     <div class="d-flex flex-column align-items-center align-self-center mt-2">
-        {% if image.words_lengths %}
-            <script>const words_lengths = {{ image.words_lengths|safe }};</script>
+        {% if attempt.words_lengths %}
+            <script>const words_lengths = {{ attempt.words_lengths|safe }};</script>
         {% endif %}
         <script src="{% static 'game/js/custom.js' %}"></script>
         {% if answer_result %}
             {% if answer_result.is_correct %}
                 <h2 class="text-primary">Correct!</h2>
-                <a href="{{ image.url }}"><img src="{{ image.url }}" height="400px"/></a>
+                <a href="{{ attempt.image_url }}"><img src="{{ attempt.image_url }}" height="400px"/></a>
                 <h2 class="text-primary text-center mt-2">{{ answer_result.correct_answer }}</h2>
                 <div class="align-items-center text-center">
                     <a
@@ -35,7 +35,7 @@
                         {% csrf_token %}
                         <div class="form-group d-flex flex-column align-items-center mt-3 mb-3">
                             <input type="hidden" name="answer" class="form-control text-center" value="{{ answer_result.given_answer }}">
-                            <input type="hidden" name="image_id" class="form-control" value="{{ image.id }}">
+                            <input type="hidden" name="attempt_id" class="form-control" value="{{ attempt.id }}">
                             <input type="hidden" name="show_correct_answer" class="form-control" value=True>
                             <input type="submit" class="btn btn-danger rounded-pill" style="width: 220px;" value="Show correct answer">
                         </div>
@@ -55,14 +55,14 @@
             {% endif %}
         {% else %}
             <h2>Guess Chan</h2>
-            {% if image.url %}
-                <a href="{{ image.url }}" style="user-select: none;"><img src="{{ image.url }}" height="400px"/></a>
+            {% if attempt.image_url %}
+                <a href="{{ attempt.image_url }}" style="user-select: none;"><img src="{{ attempt.image_url }}" height="400px"/></a>
                 <form id="guess-form" method="post" action="{% url 'game:home' %}">
                     {% csrf_token %}
                     <input type="hidden" name="answer" class="form-control text-center" value="{{ answer_result.given_answer }}">
-                    <input type="hidden" name="image_id" class="form-control" value="{{ image.id }}">
+                    <input type="hidden" name="attempt_id" class="form-control" value="{{ attempt.id }}">
                     <div id="empty-cells" class="form-group mt-3 d-flex justify-content-center">
-                      {% for word_length in image.words_lengths %}
+                      {% for word_length in attempt.words_lengths %}
                         {% for _ in word_length|range_int %}
                           <div class="empty-cell mx-1" ondragover="allowDrop(event)" ondrop="handleDrop(event)" onclick="returnLetterFromEmptyCell(this)"></div>
                         {% endfor %}
@@ -72,7 +72,7 @@
                       {% endfor %}
                     </div>
                     <div id="letters" class="form-group text-center mt-3 d-flex justify-content-center">
-                      {% for letter in image.letters %}
+                      {% for letter in attempt.letters %}
                         <div class="letter letter-cell" draggable="true" id="{{ letter }}-{{ forloop.counter }}">{{ letter }}</div>
                       {% endfor %}
                     </div>
@@ -87,8 +87,8 @@
                     </div>
                 </form>
             {% else %}
-                {% if image.message %}
-                    <p>{{ image.message }}</p>
+                {% if attempt.message %}
+                    <p>{{ attempt.message }}</p>
                 {% else %}
                     <p>Image not found</p>
                 {% endif %}
