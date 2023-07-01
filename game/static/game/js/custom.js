@@ -68,7 +68,7 @@ function handleDrop(event) {
 
   const lettersList = document.getElementById('letters');
 
-  if (existingLetter) {
+  if (existingLetter && existingLetter.id !== letterId) {
     returnLetterFromEmptyCell(emptyCell);
   }
 
