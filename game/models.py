@@ -15,7 +15,7 @@ class BaseImage(models.Model):
     image = models.ImageField(upload_to=generate_filename)
     caption = models.CharField(max_length=50, blank=True)
     author = models.CharField(max_length=50, blank=True, default='Unknown')
-    hash = models.CharField(max_length=20, blank=True, unique=True)
+    hash = models.CharField(max_length=20, blank=True, unique=False)
 
     def save(self, *args, **kwargs):
         self.hash = str(imagehash.average_hash(Image.open(getattr(self.image, 'file'))))

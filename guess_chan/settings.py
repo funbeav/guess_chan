@@ -164,3 +164,12 @@ VERIFICATION_FAILED_TEMPLATE = './project/verify/email_fail.html'
 LINK_EXPIRED_TEMPLATE = './project/verify/link_expired.html'
 NEW_EMAIL_SENT_TEMPLATE = './project/verify/new_email_sent.html'
 MAX_RETRIES = 5
+
+# Setup settings
+ADMIN_LOGIN = os.environ.get('ADMIN_LOGIN', 'admin')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin')
+SETUP_LANGS = {
+    'en': 'English',
+    'ru': 'Русский',
+    'de': 'Deutsch',
+}

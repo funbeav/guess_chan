@@ -40,7 +40,7 @@ class ChanAttemptGenerator:
         chan_name = CharacterName.objects.filter(
             character__chan=chan_image.chan,
             lang=self.lang,
-        ).first()
+        ).order_by('?').first()
 
         return chan_name.name if chan_name else ''
 
@@ -57,6 +57,11 @@ class ChanAttemptGenerator:
                 'words_lengths': words_letters_result.words_lengths,
                 'correct_answer': chan_name,
             }
+            self.chan_attempt.save()
+
+        # if get chan with another lang - change answer lang
+        if self.lang and self.chan_attempt.answer_lang != self.lang:
+            self.chan_attempt.answer_lang = self.lang
             self.chan_attempt.save()
 
     def get_next_chan_attempt(self) -> Optional[ChanAttemptResult]:
@@ -121,6 +126,7 @@ class ChanAttemptGenerator:
                     user=self.user,
                     mode=self.mode,
                     chan_image=result_chan_image,
+                    answer_lang=self.lang,
                     guess_hints={
                         self.lang.alpha2: {
                             'shown_letters': words_letters_result.letters,
@@ -249,7 +255,7 @@ class UserAttemptLogGenerator:
     _SHOWN_CORRECT = 'Viewed answer'
     _PENDING = 'Wait for guess'
     _UNKNOWN = 'Unknown'
-    _HIDDEN = '-'
+    _HIDDEN = ''
 
     def __init__(self, user: User):
         self.user = user

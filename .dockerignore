@@ -1,0 +1,10 @@
+.idea
+.venv
+.git
+.test_data
+data
+media
+static
+
+.gitignore
+.env.example
