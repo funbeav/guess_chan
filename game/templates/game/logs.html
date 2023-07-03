@@ -40,7 +40,23 @@
                                 </div>
                             </a></td>
                             <td>{{ attempt.answer }}</td>
-                            <td>{{ attempt.correct }}</td>
+                            <td>
+                                {% if attempt.correct == '' %}
+                                    <form method="post" action="{% url 'game:show_correct' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="attempt_id" value="{{ attempt.id }}">
+                                        <button
+                                            type="submit"
+                                            class="btn btn-danger rounded-pill btn-sm"
+                                            title="chan will never be shown again"
+                                        >
+                                            show correct
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    {{ attempt.correct }}
+                                {% endif %}
+                            </td>
                             <td><i>{{ attempt.status }}</i></td>
                             <td>{{ attempt.date|date:"Y-m-d H:i" }}</td>
                         </tr>

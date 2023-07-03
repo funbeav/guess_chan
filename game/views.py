@@ -1,9 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import AnonymousUser
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
 from game.generators import UserAttemptLogGenerator
-from game.models import UserChanImageAttempt
 from game.objects import ChanAttemptResult
 from game.processors import GameProcessor
 from project.forms import UserLoginForm
@@ -66,3 +65,15 @@ def logs(request):
         'attempts': attempts,
     }
     return render(request, 'game/logs.html', attrs)
+
+
+@login_required
+def show_correct(request):
+    if request.method == 'POST':
+        game = GameProcessor(user=request.user)
+        attempt_id = request.POST['attempt_id']
+        try:
+            game.show_answer(attempt_id)
+        except Exception:
+            pass
+    return redirect('game:logs')

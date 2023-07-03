@@ -59,6 +59,11 @@ class ChanAttemptGenerator:
             }
             self.chan_attempt.save()
 
+        # if get chan with another lang - change answer lang
+        if self.lang and self.chan_attempt.answer_lang != self.lang:
+            self.chan_attempt.answer_lang = self.lang
+            self.chan_attempt.save()
+
     def get_next_chan_attempt(self) -> Optional[ChanAttemptResult]:
         """Get next ChanAttemptResult"""
         chan_image = self._get_chan_image()
@@ -121,6 +126,7 @@ class ChanAttemptGenerator:
                     user=self.user,
                     mode=self.mode,
                     chan_image=result_chan_image,
+                    answer_lang=self.lang,
                     guess_hints={
                         self.lang.alpha2: {
                             'shown_letters': words_letters_result.letters,
@@ -249,7 +255,7 @@ class UserAttemptLogGenerator:
     _SHOWN_CORRECT = 'Viewed answer'
     _PENDING = 'Wait for guess'
     _UNKNOWN = 'Unknown'
-    _HIDDEN = '-'
+    _HIDDEN = ''
 
     def __init__(self, user: User):
         self.user = user

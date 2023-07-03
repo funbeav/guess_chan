@@ -1,4 +1,5 @@
 from functools import cached_property
+from typing import Optional
 
 from common.utils import deep_getattr
 from game.constants import DEFAULT_LANG
@@ -62,9 +63,13 @@ class GameProcessor:
             )
         return answer_result
 
-    def show_answer(self, chan_attempt: UserChanImageAttempt):
+    def show_answer(self, chan_attempt: Optional[UserChanImageAttempt]):
+        if not isinstance(chan_attempt, UserChanImageAttempt):
+            chan_attempt = UserChanImageAttempt.objects.get(id=chan_attempt)
+
         if not chan_attempt.is_shown:
             chan_attempt.is_shown = True
+            chan_attempt.is_pending = False
             chan_attempt.save(commit=bool(self.user))
         else:
             raise Exception(f"Chan for this Chan Image [{chan_attempt.chan_image.id}] was already shown")
