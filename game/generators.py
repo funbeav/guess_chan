@@ -40,7 +40,7 @@ class ChanAttemptGenerator:
         chan_name = CharacterName.objects.filter(
             character__chan=chan_image.chan,
             lang=self.lang,
-        ).first()
+        ).order_by('?').first()
 
         return chan_name.name if chan_name else ''
 
