@@ -11,8 +11,7 @@ from project.forms import UserLoginForm
 def index(request):
     user = request.user if not isinstance(request.user, AnonymousUser) else None
     answer_result, message = AttemptAnswerResult(), None
-    need_to_show_correct = request.POST.get('need_to_show_correct', False)
-    game = GameProcessor(user=user, need_to_show_correct=need_to_show_correct)
+    game = GameProcessor(user=user, need_to_show_correct=request.user.is_always_show_correct_answer if user else None)
 
     # POST for guessing last pending Chan
     if request.method == 'POST':
@@ -64,17 +63,21 @@ def logs(request):
         'form': UserLoginForm(request),
         'attempts': attempts,
     }
+
     return render(request, 'game/logs.html', attrs)
 
 
 @login_required
 def show_correct(request):
     if request.method == 'POST':
-        game = GameProcessor(user=request.user, need_to_show_correct=True)
+        game = GameProcessor(user=request.user)
         attempt_id = request.POST['attempt_id']
         shown_answer, message = AttemptAnswerResult(), None
         try:
             shown_answer = game.show_answer(attempt_id)
+            if request.POST.get('is_always_show_correct_answer'):
+                request.user.is_always_show_correct_answer = True
+                request.user.save()
         except Exception as exc:
             message = exc
 

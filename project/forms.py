@@ -97,10 +97,15 @@ class UserProfileForm(UserChangeForm):
         widget=forms.Select(attrs={'class': 'form-control'}),
         empty_label=None,
     )
+    is_always_show_correct_answer = forms.BooleanField(
+        label='Always Show Correct Answer',
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        required=False,
+    )
 
     class Meta:
         model = User
-        fields = ("login", "email", "image", "lang")
+        fields = ("login", "email", "image", "lang", "is_always_show_correct_answer",)
 
     def clean_image(self):
         if 'image' in self.changed_data:

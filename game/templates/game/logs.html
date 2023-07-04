@@ -4,6 +4,24 @@
 {% block title %}Logs Chan{% endblock %}
 
 {% block content %}
+<script>
+    window.addEventListener('DOMContentLoaded', function() {
+        var scrollPosition = sessionStorage.getItem('scrollPosition');
+
+        if (scrollPosition) {
+            // Scroll to the saved position with instant behavior
+            window.scrollTo({
+                top: scrollPosition,
+                behavior: 'instant'
+            });
+            sessionStorage.removeItem('scrollPosition');
+        }
+    });
+
+    window.addEventListener('beforeunload', function() {
+        sessionStorage.setItem('scrollPosition', window.pageYOffset || document.documentElement.scrollTop);
+    });
+</script>
     <div class="d-flex flex-column align-items-center align-self-center mt-2">
         <h2>Chan Logs</h2>
         <div style="width: 60%; display: flex; justify-content: center;">
