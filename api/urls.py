@@ -9,7 +9,7 @@ urlpatterns = [
     path('users/', views.UserListViewSet.as_view({'get': 'list'}), name='user'),
 
     path('play/', views.GameViewSet.as_view({
-        'get': 'get_chan_attempt',
+        'get': 'get_attempt',
         'post': 'get_answer_result',
     }), name='user'),
 ]

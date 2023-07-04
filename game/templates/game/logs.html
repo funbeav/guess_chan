@@ -5,7 +5,7 @@
 
 {% block content %}
     <div class="d-flex flex-column align-items-center align-self-center mt-2">
-        <h2>Logs</h2>
+        <h2>Chan Logs</h2>
         <div style="width: 60%; display: flex; justify-content: center;">
             <table class="table align-middle text-center">
                 <thead>
@@ -45,6 +45,7 @@
                                     <form method="post" action="{% url 'game:show_correct' %}">
                                         {% csrf_token %}
                                         <input type="hidden" name="attempt_id" value="{{ attempt.id }}">
+                                        <input type="hidden" name="source_view" class="form-control" value="logs">
                                         <button
                                             type="submit"
                                             class="btn btn-danger rounded-pill btn-sm"
