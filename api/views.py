@@ -31,16 +31,16 @@ class GameViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_serializer_class(self):
-        if self.action == 'get_chan_attempt':
+        if self.action == 'get_attempt':
             return ChanAttemptResultSerializer
         if self.action == 'get_answer_result':
             return AttemptAnswerResultSerializer
         return ChanAttemptResultSerializer
 
-    def get_chan_attempt(self, request):
+    def get_attempt(self, request):
         try:
             game = GameProcessor(user=request.user)
-            chan_image_result = game.get_chan_attempt()
+            chan_image_result = game.get_attempt()
             serializer = self.get_serializer(chan_image_result)
         except Exception as exc:
             raise APIException(exc)
@@ -51,10 +51,10 @@ class GameViewSet(viewsets.ModelViewSet):
         if not chan_image_id_to_guess:
             raise APIException("Chan Image ID is not provided")
         given_answer = request.data.get('given_answer')
-        show_correct_answer = request.data.get('show_correct_answer', False)
+        need_to_show_correct = request.data.get('need_to_show_correct', False)
 
         try:
-            game = GameProcessor(user=request.user, show_correct_answer=show_correct_answer)
+            game = GameProcessor(user=request.user, need_to_show_correct=need_to_show_correct)
             answer_result = game.process_answer(given_answer, int(chan_image_id_to_guess))
             serializer = self.get_serializer(answer_result, data=answer_result.__dict__)
             serializer.is_valid(raise_exception=True)

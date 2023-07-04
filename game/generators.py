@@ -4,7 +4,7 @@ from datetime import timedelta
 from functools import cached_property
 from typing import Optional
 
-from django.db.models import Subquery, Q
+from django.db.models import Subquery
 from django.utils import timezone
 
 from common.utils import deep_getattr
@@ -111,12 +111,12 @@ class ChanAttemptGenerator:
 
         # Create new attempt
         if not result_chan_image:
-            showed_chans_ids = UserChanImageAttempt.objects.filter(
+            previous_chans_ids = UserChanImageAttempt.objects.filter(
                 user=self.user,
                 mode=self.mode,
             ).values_list('chan_image__chan__id', flat=True)
-            new_chan = Chan.objects.filter(
-                ~Q(id__in=showed_chans_ids),
+            new_chan = Chan.objects.exclude(
+                id__in=previous_chans_ids,
             ).order_by('?').first()
             if new_chan:
                 result_chan_image = ChanImage.objects.filter(chan=new_chan).order_by('?').first()

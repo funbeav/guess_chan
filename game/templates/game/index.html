@@ -10,7 +10,7 @@
             <script>const words_lengths = {{ attempt.words_lengths|safe }};</script>
         {% endif %}
         <script src="{% static 'game/js/custom.js' %}"></script>
-        {% if answer_result %}
+        {% if answer_result.attempt_id %}
             {% if answer_result.is_correct %}
                 <h2 class="text-primary">Correct!</h2>
                 <a href="{{ attempt.image_url }}"><img src="{{ attempt.image_url }}" height="400px"/></a>
@@ -31,13 +31,23 @@
                     <a href="{{ answer_result.character_image_url }}"><img src="{{ answer_result.character_image_url }}" height="400px"/></a>
                     <h2 class="text-danger text-center mt-2">{{ answer_result.correct_answer }}</h2>
                 {% else %}
-                    <form method="post" action="{% url 'game:home' %}" >
+                    <form method="post" action="{% url 'game:show_correct' %}" >
                         {% csrf_token %}
-                        <div class="form-group d-flex flex-column align-items-center mt-3 mb-3">
-                            <input type="hidden" name="answer" class="form-control text-center" value="{{ answer_result.given_answer }}">
+                        <div class="form-group d-flex flex-column align-items-center mt-3">
                             <input type="hidden" name="attempt_id" class="form-control" value="{{ attempt.id }}">
-                            <input type="hidden" name="show_correct_answer" class="form-control" value=True>
-                            <input type="submit" class="btn btn-danger rounded-pill" style="width: 220px;" value="Show correct answer">
+                            <input type="hidden" name="need_to_show_correct" class="form-control" value=True>
+                            <input type="hidden" name="source_view" class="form-control" value="home">
+                            <input type="submit" class="btn btn-danger rounded-pill mb-3" style="width: 220px;" value="Show correct answer">
+                            <div class="form-check mb-2">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    name="is_always_show_correct_answer"
+                                >
+                                <label class="form-check-label">
+                                    <small>Always show correct answer</small>
+                                </label>
+                            </div>
                         </div>
                     </form>
                     <p> (chan will never be shown again)</p>
