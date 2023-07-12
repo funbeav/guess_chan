@@ -173,3 +173,4 @@ SETUP_LANGS = {
     'ru': 'Русский',
     'de': 'Deutsch',
 }
+INIT_CHANS_FOLDER = os.environ.get('INIT_CHANS_FOLDER', '.init_chans')
