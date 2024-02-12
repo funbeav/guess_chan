@@ -36,7 +36,7 @@ class ChanAdmin(admin.ModelAdmin):
         css = {
             'all': ('game/css/custom_admin.css',)
         }
-    list_display = ('name', 'character',)
+    list_display = ('character',)
     inlines = [ChanImageInline]
 
 

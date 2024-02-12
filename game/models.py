@@ -1,8 +1,5 @@
-import datetime
-
 import imagehash
 from PIL import Image
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 
@@ -39,35 +36,40 @@ class CharacterImage(BaseImage):
     def image_folder(self):
         return 'character'
 
+    def __str__(self):
+        return f'[{self.pk}] {self.character.name} Image'
+
 
 class CharacterName(models.Model):
     """Acceptable Character's name"""
 
     character = models.ForeignKey(Character, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50)
     lang = models.ForeignKey(Lang, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.character.name} ~ {self.name}'
+        return f'{self.character.name} ~ {self.name} ({self.lang.alpha2})'
+
+    class Meta:
+        unique_together = ('character', 'name')
 
 
 class Chan(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-    character = models.OneToOneField(Character, on_delete=models.SET_NULL, null=True, blank=True, related_name='chan')
+    character = models.OneToOneField(Character, on_delete=models.CASCADE, null=True, blank=True, related_name='chan')
 
     def __str__(self):
-        return f'[{self.pk}] {self.name}'
+        return f'[{self.pk}] {self.character.name} Chan'
 
 
 class ChanImage(BaseImage):
-    chan = models.ForeignKey(Chan, on_delete=models.SET_NULL, null=True, blank=True)
+    chan = models.ForeignKey(Chan, on_delete=models.CASCADE, null=True, blank=True)
 
     @property
     def image_folder(self):
         return 'chan'
 
     def __str__(self):
-        return f'[{self.pk}] {self.chan.name} Image'
+        return f'{self.chan} Image'
 
 
 class UserChanImageAttempt(models.Model):

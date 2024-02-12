@@ -141,6 +141,27 @@ REST_FRAMEWORK = {
     # ]
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',  # Set the desired logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
+
 # Media settings
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
@@ -173,3 +194,4 @@ SETUP_LANGS = {
     'ru': 'Русский',
     'de': 'Deutsch',
 }
+INIT_CHANS_FOLDER = os.environ.get('INIT_CHANS_FOLDER', '.init_chans')
