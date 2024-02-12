@@ -5,7 +5,7 @@ from pathlib import Path
 from django.core.management.base import BaseCommand
 
 from game.services import ChanService
-from guess_chan import settings
+from django.conf import settings
 
 
 class Command(BaseCommand):
@@ -43,7 +43,7 @@ class Command(BaseCommand):
 
         # Get dict with langs and their values from names.json
         names_json_path = os.path.join(chan_folder_path, "names.json")
-        with open(names_json_path, "r") as names_file:
+        with open(names_json_path, "r", encoding='utf-8-sig') as names_file:
             names_data = json.load(names_file)
         self.stdout.write("Dict with langs and their values:")
         self.stdout.write(str(names_data))
